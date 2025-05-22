@@ -1,19 +1,23 @@
 <?php
-// Configurações de conexão com o banco
-$host = '127.0.0.1';      // ou 'localhost'
-$dbname = 'gri_sistema';  // nome do banco que você criou
-$user = 'root';           // usuário do MySQL
-$pass = '';               // senha (caso tenha colocado uma, insira aqui)
+// includes/db.php
 
-// Conexão usando PDO
+$host = getenv('DB_HOST') ?: 'localhost';
+$db   = getenv('DB_NAME') ?: 'gri_system';
+$user = getenv('DB_USER') ?: 'root';
+$pass = getenv('DB_PASS') ?: '';
+$charset = 'utf8mb4';
+
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
+
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
-    
-    // Configura o modo de erro para exceções (boa prática)
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+    $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (PDOException $e) {
-    // Se der erro, para o sistema e exibe a mensagem
-    die("Erro na conexão com o banco de dados: " . $e->getMessage());
+    // Para ambiente de produção, remova a mensagem detalhada e logue o erro
+    die('Erro na conexão com o banco de dados: ' . $e->getMessage());
 }
-?>
