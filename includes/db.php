@@ -1,5 +1,4 @@
 <?php
-// Pega a URL do banco no estilo: mysql://user:pass@host:port/database
 $mysqlUrl = getenv("MYSQL_URL");
 
 if ($mysqlUrl) {
@@ -17,6 +16,6 @@ if ($mysqlUrl) {
         die("Erro na conexão com o banco de dados: " . $e->getMessage());
     }
 } else {
-    die("Variável MYSQL_URL não encontrada.");
+    die("MYSQL_URL não configurada.");
 }
 ?>
