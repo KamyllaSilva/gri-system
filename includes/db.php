@@ -1,21 +1,12 @@
 <?php
-$mysqlUrl = getenv("MYSQL_URL");
+$host = getenv("DB_HOST");
+$db   = getenv("DB_NAME");
+$user = getenv("DB_USER");
+$pass = getenv("DB_PASS");
 
-if ($mysqlUrl) {
-    $url = parse_url($mysqlUrl);
-    $host = $url["host"];
-    $port = $url["port"];
-    $user = $url["user"];
-    $pass = $url["pass"];
-    $dbname = ltrim($url["path"], "/");
-
-    try {
-        $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $user, $pass);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    } catch (PDOException $e) {
-        die("Erro na conexão com o banco de dados: " . $e->getMessage());
-    }
-} else {
-    die("MYSQL_URL não configurada.");
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Erro na conexão com o banco de dados: " . $e->getMessage());
 }
-?>
