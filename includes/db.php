@@ -1,13 +1,22 @@
 <?php
-$host = getenv('DB_HOST') ?: '127.0.0.1';
-$dbname = getenv('DB_NAME') ?: 'gri_sistema';
-$user = getenv('DB_USER') ?: 'root';
-$pass = getenv('DB_PASS') ?: '';
+// Pega a URL do banco no estilo: mysql://user:pass@host:port/database
+$mysqlUrl = getenv("MYSQL_URL");
 
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $pass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    die("Erro na conexão com o banco de dados: " . $e->getMessage());
+if ($mysqlUrl) {
+    $url = parse_url($mysqlUrl);
+    $host = $url["host"];
+    $port = $url["port"];
+    $user = $url["user"];
+    $pass = $url["pass"];
+    $dbname = ltrim($url["path"], "/");
+
+    try {
+        $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $user, $pass);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        die("Erro na conexão com o banco de dados: " . $e->getMessage());
+    }
+} else {
+    die("Variável MYSQL_URL não encontrada.");
 }
 ?>
