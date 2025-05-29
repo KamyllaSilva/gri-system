@@ -46,6 +46,7 @@ require_once 'includes/header.php';
     <p id="login-desc" style="margin-bottom: 20px; color:#555;">
         Entre com suas credenciais para acessar o sistema.
     </p>
+<p><a href="register.php">Não tem conta? Cadastre-se</a></p>
 
     <label for="email">Email</label>
     <input type="email" id="email" name="email" placeholder="seu@email.com" required autofocus>
