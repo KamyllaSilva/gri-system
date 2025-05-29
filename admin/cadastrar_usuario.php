@@ -1,64 +1,46 @@
-<?php
-session_start();
-require_once '../includes/db.php';
-
-if (!isset($_SESSION['user_id']) || $_SESSION['user_tipo'] !== 'admin') {
-    header("Location: ../index.php");
-    exit();
-}
-
-// Buscar empresas para associar
-$empresas = $pdo->query("SELECT id, nome FROM empresas")->fetchAll();
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nome = $_POST['nome'];
-    $email = $_POST['email'];
-    $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
-    $tipo = $_POST['tipo'];
-    $empresa_id = $_POST['empresa_id'];
-
-    $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, senha, tipo, empresa_id) VALUES (?, ?, ?, ?, ?)");
-    $stmt->execute([$nome, $email, $senha, $tipo, $empresa_id]);
-
-    header("Location: dashboard.php");
-    exit();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastrar Usuário</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <title>Cadastro de Usuários - Sistema GRI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <h2>Cadastrar Novo Usuário</h2>
-    <form method="POST">
-        <label>Nome:</label><br>
-        <input type="text" name="nome" required><br><br>
+    <header class="header">
+        <img src="assets/img/logo.png" alt="Logo" class="logo-small">
+        <h1>Sistema GRI</h1>
+        <nav>
+            <a href="dashboard.php">Painel</a>
+            <a href="indicadores.php">Indicadores</a>
+            <a href="usuarios.php">Usuários</a>
+            <a href="logout.php">Sair</a>
+        </nav>
+    </header>
 
-        <label>Email:</label><br>
-        <input type="email" name="email" required><br><br>
+    <main class="container">
+        <section class="form-section">
+            <h2>Cadastro de Usuário</h2>
+            <form method="POST" action="criar_usuario.php">
+                <label for="nome">Nome</label>
+                <input type="text" name="nome" id="nome" required>
 
-        <label>Senha:</label><br>
-        <input type="password" name="senha" required><br><br>
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" required>
 
-        <label>Tipo de Usuário:</label><br>
-        <select name="tipo" required>
-            <option value="usuario">Usuário</option>
-            <option value="admin">Administrador</option>
-        </select><br><br>
+                <label for="senha">Senha</label>
+                <input type="password" name="senha" id="senha" required>
 
-        <label>Empresa:</label><br>
-        <select name="empresa_id" required>
-            <?php foreach ($empresas as $empresa): ?>
-                <option value="<?= $empresa['id'] ?>"><?= $empresa['nome'] ?></option>
-            <?php endforeach; ?>
-        </select><br><br>
+                <label for="permissao">Permissão</label>
+                <select name="permissao" id="permissao" required>
+                    <option value="admin">Administrador</option>
+                    <option value="usuario">Usuário</option>
+                </select>
 
-        <button type="submit">Cadastrar</button>
-    </form>
-    <p><a href="dashboard.php">← Voltar</a></p>
+                <button type="submit">Cadastrar</button>
+            </form>
+        </section>
+    </main>
 </body>
 </html>
