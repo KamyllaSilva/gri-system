@@ -5,7 +5,20 @@ include 'includes/db.php';
 // Recebe dados do formulário
 $email = $_POST['email'] ?? '';
 $senha = $_POST['senha'] ?? '';
+// Coleta dados das variáveis Railway
+$host = getenv("DB_HOST") ?? 'mysql.railway.internal';
+$dbname = getenv("DB_NAME") ?? 'railway';
+$user = getenv("DB_USER") ?? 'root';
+$pass = getenv("DB_PASS") ?? 'uiieAgKnVVmRzCiByaTGwZZPuPurwuQX';
 
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
+} catch (PDOException $e) {
+    die("Erro ao conectar ao banco de dados: " . $e->getMessage());
+}
 // Verifica no banco de dados
 $query = "SELECT * FROM usuarios WHERE email = ? LIMIT 1";
 $stmt = $conn->prepare($query);
