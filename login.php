@@ -1,35 +1,28 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Login - Sistema GRI</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body>
-    <main class="container">
-        <div class="login-box">
-            <img src="assets/img/logo.png" alt="Logo Sistema GRI" class="logo-small">
-            <h2>Bem-vindo de volta</h2>
-            <p class="subtitle">Faça login para continuar</p>
+<?php
+session_start();
+include 'includes/db.php';
 
-            <?php if (isset($_GET['erro'])): ?>
-                <p class="error-message">Usuário ou senha inválidos!</p>
-            <?php endif; ?>
+// Recebe dados do formulário
+$email = $_POST['email'] ?? '';
+$senha = $_POST['senha'] ?? '';
 
-            <form method="POST" action="login.php">
-                <label for="email">Email</label>
-                <input type="email" name="email" id="email" required>
+// Verifica no banco de dados
+$query = "SELECT * FROM usuarios WHERE email = ? LIMIT 1";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("s", $email);
+$stmt->execute();
+$result = $stmt->get_result();
 
-                <label for="senha">Senha</label>
-                <input type="password" name="senha" id="senha" required>
+if ($result->num_rows === 1) {
+    $usuario = $result->fetch_assoc();
 
-                <button type="submit">Entrar</button>
-            </form>
+    if (password_verify($senha, $usuario['senha'])) {
+        $_SESSION['usuario_id'] = $usuario['id'];
+        $_SESSION['usuario_nome'] = $usuario['nome'];
+        header("Location: dashboard.php");
+        exit;
+    }
+}
 
-            <p class="register-link">Não tem conta? <a href="register.php">Cadastre-se</a></p>
-        </div>
-    </main>
-</body>
-</html>
+header("Location: index.php?erro=1");
+exit;
