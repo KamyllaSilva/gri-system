@@ -1,46 +1,59 @@
 <?php
 session_start();
+require_once 'includes/db.php';
+
+$page_title = "Login - Sistema GRI";
+
 if (isset($_SESSION['user_id'])) {
-    if ($_SESSION['user_tipo'] === 'admin') {
-        header("Location: admin/dashboard.php");
-    } else {
-        header("Location: user/indicators.php");
-    }
+    // Já logado, redireciona para a área do usuário
+    header("Location: user/indicators.php");
     exit();
 }
 
-$erro = isset($_GET['erro']) ? "Email ou senha inválidos." : "";
+$erro = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    $senha = $_POST['senha'] ?? '';
+
+    if (!$email || empty($senha)) {
+        $erro = "Preencha email e senha corretamente.";
+    } else {
+        $stmt = $pdo->prepare("SELECT id, nome, senha_hash, tipo FROM usuarios WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+
+        if ($user && password_verify($senha, $user['senha_hash'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_nome'] = $user['nome'];
+            $_SESSION['user_tipo'] = $user['tipo'];
+            header("Location: user/indicators.php");
+            exit();
+        } else {
+            $erro = "Email ou senha incorretos.";
+        }
+    }
+}
+require_once 'includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Login - Sistema GRI</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body class="flex items-center justify-center min-h-screen bg-gray-100">
-    <div class="w-full max-w-md bg-white p-6 rounded shadow">
-        <h2 class="text-2xl font-bold text-center text-purple-700 mb-6">Login - Sistema GRI</h2>
+<h2 class="page-title">Login</h2>
 
-        <?php if ($erro): ?>
-            <p class="text-red-500 text-sm text-center mb-4"><?= $erro ?></p>
-        <?php endif; ?>
+<?php if ($erro): ?>
+    <div class="alert alert-error" role="alert"><?= htmlspecialchars($erro) ?></div>
+<?php endif; ?>
 
-        <form action="includes/auth.php" method="POST" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium">Email:</label>
-                <input type="email" name="email" required class="w-full px-4 py-2 border rounded">
-            </div>
-            <div>
-                <label class="block text-sm font-medium">Senha:</label>
-                <input type="password" name="senha" required class="w-full px-4 py-2 border rounded">
-            </div>
-            <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700">
-                Entrar
-            </button>
-        </form>
-    </div>
-</body>
-</html>
+<form method="POST" novalidate aria-describedby="login-desc">
+    <p id="login-desc" style="margin-bottom: 20px; color:#555;">
+        Entre com suas credenciais para acessar o sistema.
+    </p>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="seu@email.com" required autofocus>
+
+    <label for="senha">Senha</label>
+    <input type="password" id="senha" name="senha" placeholder="Sua senha" required>
+
+    <button type="submit" aria-label="Entrar no sistema">Entrar</button>
+</form>
+
+<?php require_once 'includes/footer.php'; ?>
