@@ -1,6 +1,12 @@
 <?php
 session_start();
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // Se a pessoa acessou direto via navegador, redireciona para login
+    header("Location: login.php");
+    exit();
+}
+
 // Recebe dados do formulário
 $email = $_POST['email'] ?? '';
 $senha = $_POST['senha'] ?? '';
