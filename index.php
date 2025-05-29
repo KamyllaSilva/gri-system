@@ -1,60 +1,38 @@
-<?php
-session_start();
-require_once 'includes/db.php';
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema GRI</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <img src="assets/img/logo.png" alt="Logo Sistema GRI" class="logo">
 
-$page_title = "Login - Sistema GRI";
+            <h2>Bem-vindo de volta</h2>
+            <p class="subtitle">Faça login para continuar</p>
 
-if (isset($_SESSION['user_id'])) {
-    // Já logado, redireciona para a área do usuário
-    header("Location: user/indicators.php");
-    exit();
-}
+            <?php if (isset($_GET['erro'])): ?>
+                <p class="error-message">Usuário ou senha inválidos!</p>
+            <?php endif; ?>
 
-$erro = '';
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
-    $senha = $_POST['senha'] ?? '';
+            <form method="POST" action="login.php">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" placeholder="Digite seu email" required>
 
-    if (!$email || empty($senha)) {
-        $erro = "Preencha email e senha corretamente.";
-    } else {
-        $stmt = $pdo->prepare("SELECT id, nome, senha_hash, tipo FROM usuarios WHERE email = ?");
-        $stmt->execute([$email]);
-        $user = $stmt->fetch();
+                <label for="senha">Senha</label>
+                <input type="password" name="senha" id="senha" placeholder="Digite sua senha" required>
 
-        if ($user && password_verify($senha, $user['senha_hash'])) {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['user_nome'] = $user['nome'];
-            $_SESSION['user_tipo'] = $user['tipo'];
-            header("Location: user/indicators.php");
-            exit();
-        } else {
-            $erro = "Email ou senha incorretos.";
-        }
-    }
-}
-require_once 'includes/header.php';
-?>
+                <button type="submit">Entrar</button>
+            </form>
 
-<h2 class="page-title">Login</h2>
+            <p class="register-link">
+                Não tem conta? <a href="register.php">Cadastre-se</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
 
-<?php if ($erro): ?>
-    <div class="alert alert-error" role="alert"><?= htmlspecialchars($erro) ?></div>
-<?php endif; ?>
-
-<form method="POST" novalidate aria-describedby="login-desc">
-    <p id="login-desc" style="margin-bottom: 20px; color:#555;">
-        Entre com suas credenciais para acessar o sistema.
-    </p>
-<p><a href="register.php">Não tem conta? Cadastre-se</a></p>
-
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email" placeholder="seu@email.com" required autofocus>
-
-    <label for="senha">Senha</label>
-    <input type="password" id="senha" name="senha" placeholder="Sua senha" required>
-
-    <button type="submit" aria-label="Entrar no sistema">Entrar</button>
-</form>
-
-<?php require_once 'includes/footer.php'; ?>
