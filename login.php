@@ -1,11 +1,11 @@
 <?php
 session_start();
-include 'includes/db.php';
 
 // Recebe dados do formulário
 $email = $_POST['email'] ?? '';
 $senha = $_POST['senha'] ?? '';
-// Coleta dados das variáveis Railway
+
+// Configura variáveis do banco de dados
 $host = getenv("DB_HOST") ?? 'mysql.railway.internal';
 $dbname = getenv("DB_NAME") ?? 'railway';
 $user = getenv("DB_USER") ?? 'root';
@@ -19,22 +19,18 @@ try {
 } catch (PDOException $e) {
     die("Erro ao conectar ao banco de dados: " . $e->getMessage());
 }
-// Verifica no banco de dados
+
+// Agora prepare e execute usando $pdo
 $query = "SELECT * FROM usuarios WHERE email = ? LIMIT 1";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("s", $email);
-$stmt->execute();
-$result = $stmt->get_result();
+$stmt = $pdo->prepare($query);
+$stmt->execute([$email]);
+$usuario = $stmt->fetch();
 
-if ($result->num_rows === 1) {
-    $usuario = $result->fetch_assoc();
-
-    if (password_verify($senha, $usuario['senha'])) {
-        $_SESSION['usuario_id'] = $usuario['id'];
-        $_SESSION['usuario_nome'] = $usuario['nome'];
-        header("Location: dashboard.php");
-        exit;
-    }
+if ($usuario && password_verify($senha, $usuario['senha'])) {
+    $_SESSION['usuario_id'] = $usuario['id'];
+    $_SESSION['usuario_nome'] = $usuario['nome'];
+    header("Location: dashboard.php");
+    exit;
 }
 
 header("Location: index.php?erro=1");
