@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 // Coleta dados das variáveis Railway
 $host = getenv("DB_HOST") ?? 'mysql.railway.internal';
-$db   = getenv("DB_NAME") ?? 'railway';
+$dbname = getenv("DB_NAME") ?? 'railway';
 $user = getenv("DB_USER") ?? 'root';
 $pass = getenv("DB_PASS") ?? 'uiieAgKnVVmRzCiByaTGwZZPuPurwuQX';
 
