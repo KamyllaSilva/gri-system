@@ -12,13 +12,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $usuario = $stmt->fetch();
 
         if ($usuario && password_verify($senha, $usuario['senha'])) {
-            // Login bem-sucedido
             $_SESSION['user_id'] = $usuario['id'];
             $_SESSION['user_nome'] = $usuario['nome'];
             $_SESSION['user_tipo'] = $usuario['tipo'];
             $_SESSION['empresa_id'] = $usuario['empresa_id'];
 
-            // Redireciona conforme o tipo de usuário
             if ($usuario['tipo'] === 'admin') {
                 header("Location: ../admin/dashboard.php");
             } else {
@@ -26,7 +24,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
         } else {
-            // Erro de login
             header("Location: ../index.php?erro=1");
             exit();
         }
