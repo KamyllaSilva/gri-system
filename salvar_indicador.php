@@ -1,5 +1,9 @@
 <?php
 session_start();
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+echo "Banco conectado: $dbname<br>";
+
 
 // Verificação de autenticação
 if (!isset($_SESSION['usuario_id'])) {
