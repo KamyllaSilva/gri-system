@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once '../includes/db.php';
+require_once 'includes/db.php';
 
 // Verifica se é admin
 if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] !== 'admin') {
-    header("Location: ../login.php");
+    header("Location: login.php");
     exit;
 }
 
