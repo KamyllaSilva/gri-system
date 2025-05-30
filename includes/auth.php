@@ -43,7 +43,7 @@ if ($usuario && password_verify($senha, $usuario['senha'])) {
     $_SESSION['usuario_id'] = $usuario['id'];
     $_SESSION['usuario_nome'] = $usuario['nome'];
     $_SESSION['usuario_tipo'] = $usuario['tipo']; // Opcional: tipo de usuário
-    header("Location: dashboard.php");
+    header("Location: includes/dashboard.php");
     exit();
 }
 
