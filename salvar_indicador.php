@@ -2,22 +2,20 @@
 session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-echo "Banco conectado: $dbname<br>";
 
-
-// Verificação de autenticação
+// Verifica se o usuário está autenticado
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Verifica se foi enviado por POST
+// Verifica se a requisição é POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: indicadores.php");
     exit();
 }
 
-// Configurações do banco
+// Conexão com o banco
 $host = getenv("DB_HOST") ?: 'mysql.railway.internal';
 $dbname = getenv("DB_NAME") ?: 'railway';
 $user = getenv("DB_USER") ?: 'root';
@@ -28,12 +26,12 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     ]);
 } catch (PDOException $e) {
-    die("Erro na conexão com o banco de dados: " . $e->getMessage());
+    die("Erro na conexão com o banco: " . $e->getMessage());
 }
 
-// Recebe os dados
-$indicador = trim($_POST['indicador']);
-$resposta = trim($_POST['resposta']);
+// Dados do formulário
+$indicador_id = $_POST['indicador_id'] ?? null;
+$resposta = trim($_POST['resposta'] ?? '');
 $usuario_id = $_SESSION['usuario_id'];
 $caminho_arquivo = null;
 
@@ -55,10 +53,11 @@ if (isset($_FILES['arquivo']) && $_FILES['arquivo']['error'] === UPLOAD_ERR_OK) 
 }
 
 // Inserção no banco
-$sql = "INSERT INTO indicadores (codigo, resposta, evidencia, criado_por, status) VALUES (?, ?, ?, ?, 'preenchido')";
+$sql = "INSERT INTO respostas (indicador_id, resposta, evidencia, criado_por, status)
+        VALUES (?, ?, ?, ?, 'preenchido')";
 $stmt = $pdo->prepare($sql);
-$stmt->execute([$indicador, $resposta, $caminho_arquivo, $usuario_id]);
+$stmt->execute([$indicador_id, $resposta, $caminho_arquivo, $usuario_id]);
 
-// Redireciona após sucesso
 header("Location: indicadores.php?sucesso=1");
 exit();
+?>
