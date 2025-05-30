@@ -94,7 +94,7 @@ $erro = $_GET['erro'] ?? null;
         <div class="error">Usuário ou senha inválidos.</div>
     <?php endif; ?>
 
-    <form action="auth.php" method="POST">
+    <form action="includes/auth.php" method="POST">
         <input type="email" name="email" placeholder="Seu e-mail" required>
         <input type="password" name="senha" placeholder="Sua senha" required>
         <button type="submit">Entrar</button>
