@@ -53,7 +53,7 @@ if (isset($_FILES['arquivo']) && $_FILES['arquivo']['error'] === UPLOAD_ERR_OK) 
 }
 
 // Inserção no banco
-$sql = "INSERT INTO respostas (indicador_id, resposta, evidencia, criado_por, status)
+$sql = "INSERT INTO respostas_indicadores (indicador_id, resposta, evidencia, criado_por, status)
         VALUES (?, ?, ?, ?, 'preenchido')";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$indicador_id, $resposta, $caminho_arquivo, $usuario_id]);
