@@ -1,8 +1,6 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-
-// ✅ SEGURANÇA: desativa cache de resposta JSON (bom para APIs privadas)
 header('Cache-Control: no-store, no-cache, must-revalidate');
 header('Pragma: no-cache');
 
@@ -14,7 +12,13 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
 }
 
 // ✅ CONEXÃO
-require_once __DIR__ . '/includes/conexao.php';
+require_once __DIR__ . '/includes/conexao.php'; // certifique-se que $pdo está sendo criado dentro desse arquivo
+
+if (!isset($pdo) || !$pdo instanceof PDO) {
+    http_response_code(500);
+    echo json_encode(['status' => 'error', 'message' => 'Falha na conexão com o banco de dados']);
+    exit;
+}
 
 // ✅ SANITIZAÇÃO
 $empresa_id = filter_var($_SESSION['empresa_id'], FILTER_VALIDATE_INT);
@@ -70,7 +74,7 @@ try {
     ]);
 
 } catch (PDOException $e) {
-    error_log("Erro no dashboard-data.php: " . $e->getMessage()); // ✅ SEGURANÇA: log no servidor, não no cliente
+    error_log("Erro no dashboard-data.php: " . $e->getMessage());
     http_response_code(500);
     echo json_encode(['status' => 'error', 'message' => 'Erro interno no servidor']);
 }
