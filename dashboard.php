@@ -221,7 +221,7 @@ if (!isset($_SESSION['usuario_id'])) {
 </head>
 <body>
     <header>
-        <img src="assets/img/logo.png" alt="Logo" class="logo-small" />
+        <img src="assets/css/img/logo.png" alt="Logo" class="logo-small" />
         <h1>Sistema GRI</h1>
         <nav>
             <a href="dashboard.php" class="active">Painel</a>
