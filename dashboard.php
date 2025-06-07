@@ -1,371 +1,407 @@
-<?php
-session_start();
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location: login.php");
-    exit();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8" />
-    <title>Painel Profissional - Sistema GRI</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0; padding: 0;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Profissional</title>
+  <style>
+    /* Variáveis CSS para tema e tipografia */
+    :root {
+      --color-bg: #1565c0;
+      --color-bg-dark: #0d47a1;
+      --color-text-light: #e3f2fd;
+      --color-text-muted: #bbdefb;
+      --color-primary: #81D4FA;
+      --color-error: #ef5350;
+      --font-family: 'Inter', sans-serif;
+      --transition-speed: 0.3s;
+      --border-radius: 12px;
+      --shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0D47A1, #1976D2);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+    /* Reset e global */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      background-color: var(--color-bg);
+      color: var(--color-text-light);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a {
+      color: var(--color-text-light);
+      text-decoration: none;
+    }
+    a:focus, button:focus, [role="button"]:focus {
+      outline: 3px solid var(--color-primary);
+      outline-offset: 3px;
+    }
 
-        header {
-            background: #093170;
-            padding: 15px 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-        }
+    /* Cabeçalho */
+    header {
+      background-color: var(--color-bg-dark);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0;
+    }
 
-        header img.logo-small {
-            height: 48px;
-            filter: drop-shadow(0 0 3px rgba(0,0,0,0.5));
-        }
+    /* Perfil com dropdown */
+    .profile {
+      position: relative;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      color: var(--color-text-muted);
+    }
+    .profile:focus-visible {
+      outline: 3px solid var(--color-primary);
+      outline-offset: 3px;
+    }
+    .profile > span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      user-select: none;
+    }
+    .profile svg {
+      width: 0.7rem;
+      height: 0.7rem;
+      fill: var(--color-text-muted);
+      transition: transform var(--transition-speed);
+    }
+    .profile[aria-expanded="true"] svg {
+      transform: rotate(180deg);
+    }
 
-        header h1 {
-            font-weight: 700;
-            font-size: 1.8rem;
-            letter-spacing: 2px;
-            user-select: none;
-            flex-grow: 1;
-            margin-left: 15px;
-            color: #BBDEFB;
-        }
+    .dropdown {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--color-bg-dark);
+      border-radius: var(--border-radius);
+      margin-top: 0.5rem;
+      min-width: 160px;
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      padding: 0.25rem 0;
+    }
+    .dropdown[aria-hidden="false"] {
+      display: block;
+    }
+    .dropdown a {
+      display: block;
+      padding: 0.75rem 1.25rem;
+      font-size: 1rem;
+      color: var(--color-text-light);
+      transition: background-color var(--transition-speed);
+    }
+    .dropdown a:hover,
+    .dropdown a:focus-visible {
+      background-color: var(--color-primary);
+      color: var(--color-bg-dark);
+      outline: none;
+    }
 
-        nav a {
-            color: #BBDEFB;
-            font-weight: 600;
-            margin-left: 25px;
-            text-decoration: none;
-            transition: color 0.3s ease;
-            position: relative;
-        }
+    /* Conteúdo principal */
+    main {
+      flex: 1;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
 
-        nav a::after {
-            content: '';
-            position: absolute;
-            width: 0%;
-            height: 2px;
-            bottom: -4px;
-            left: 0;
-            background-color: #64B5F6;
-            transition: width 0.3s ease;
-            border-radius: 2px;
-        }
+    /* Loading Spinner */
+    #loading {
+      margin: 3rem auto;
+      text-align: center;
+      font-size: 1.2rem;
+      color: var(--color-text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    .spinner {
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      width: 3rem;
+      height: 3rem;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
 
-        nav a:hover, nav a.active {
-            color: #E3F2FD;
-        }
+    /* Cards grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+      gap: 2rem;
+      outline: none;
+    }
+    .card-indicador {
+      background-color: var(--color-bg-dark);
+      padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      transition: background-color var(--transition-speed), transform var(--transition-speed);
+      user-select: none;
+    }
+    .card-indicador:hover,
+    .card-indicador:focus-visible {
+      background-color: var(--color-primary);
+      color: var(--color-bg-dark);
+      transform: translateY(-4px);
+      outline: none;
+    }
+    .card-indicador p {
+      font-size: 3rem;
+      font-weight: 800;
+      margin: 0 0 0.5rem;
+      line-height: 1;
+    }
+    .card-indicador span {
+      font-size: 1.1rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
 
-        nav a:hover::after, nav a.active::after {
-            width: 100%;
-        }
+    /* Chart container */
+    #chart-container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: var(--color-bg-dark);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+    }
 
-        main.container {
-            flex-grow: 1;
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px 60px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.35);
-            backdrop-filter: blur(10px);
-        }
+    /* Texto acessível escondido */
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0,0,0,0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
 
-        section.dashboard-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        section.dashboard-header h2 {
-            font-size: 2.8rem;
-            font-weight: 700;
-            letter-spacing: 3px;
-            text-shadow: 1px 1px 5px rgba(0,0,0,0.6);
-            margin-bottom: 10px;
-        }
-
-        section.dashboard-header p {
-            font-size: 1.1rem;
-            color: #cce4ff;
-            font-weight: 500;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 30px;
-            margin-bottom: 50px;
-        }
-
-        .card {
-            background: linear-gradient(145deg, #1E88E5, #1565C0);
-            border-radius: 18px;
-            padding: 30px 25px;
-            box-shadow: 0 10px 15px rgba(0,0,0,0.3);
-            text-align: center;
-            cursor: default;
-            user-select: none;
-            color: #e3f2fd;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 18px 25px rgba(0,0,0,0.45);
-        }
-
-        .card h3 {
-            font-size: 1.6rem;
-            margin-bottom: 12px;
-            font-weight: 700;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-        }
-
-        .card p {
-            font-size: 2.8rem;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            color: #bbdefb;
-            text-shadow: 2px 2px 10px rgba(255,255,255,0.6);
-        }
-
-        /* Cards indicadores (clicáveis) */
-        .cards-indicadores {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 24px;
-        }
-
-        .card-indicador {
-            background: linear-gradient(145deg, #42A5F5, #1E88E5);
-            border-radius: 16px;
-            padding: 22px 18px;
-            box-shadow: 0 8px 12px rgba(0,0,0,0.2);
-            cursor: pointer;
-            color: #f0f7ff;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .card-indicador:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 14px 20px rgba(0,0,0,0.35);
-            background: linear-gradient(145deg, #64B5F6, #1976D2);
-        }
-
-        .card-indicador h4 {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin-bottom: 6px;
-            user-select: text;
-            text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
-        }
-
-        .card-indicador span.valor {
-            font-size: 1.9rem;
-            font-weight: 800;
-            letter-spacing: 1px;
-            color: #dbe9ff;
-            user-select: text;
-            text-shadow: 2px 2px 8px rgba(255,255,255,0.7);
-        }
-
-        canvas#indicadoresChart {
-            display: block;
-            max-width: 480px;
-            margin: 0 auto 50px;
-            filter: drop-shadow(0 3px 8px rgba(0,0,0,0.25));
-            border-radius: 20px;
-            background: rgba(255,255,255,0.15);
-        }
-
-        @media (max-width: 768px) {
-            main.container {
-                margin: 20px 15px 50px;
-                padding: 20px;
-            }
-            header {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 10px;
-            }
-            nav a {
-                margin-left: 15px;
-                font-size: 0.95rem;
-            }
-        }
-    </style>
+    /* Responsividade fina */
+    @media (max-width: 600px) {
+      .card-indicador p {
+        font-size: 2.5rem;
+      }
+      main {
+        gap: 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <img src="assets/css/img/logo.png" alt="Logo" class="logo-small" />
-        <h1>Sistema GRI</h1>
-        <nav>
-            <a href="dashboard.php" class="active">Painel</a>
-            <a href="indicadores.php">Indicadores</a>
-            <a href="usuarios.php">Usuários</a>
-            <a href="logout.php">Sair</a>
-        </nav>
-    </header>
 
-    <main class="container">
-        <section class="dashboard-header">
-            <h2>Painel de Indicadores</h2>
-            <p>Bem-vindo(a), <?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Usuário') ?>!</p>
-        </section>
+<header>
+  <h1>Dashboard Profissional</h1>
+  <div class="profile" tabindex="0" role="button" aria-haspopup="true" aria-expanded="false" aria-label="Menu do usuário" id="profileMenuButton">
+    <span>
+      Usuário
+      <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.584l3.71-4.353a.75.75 0 111.14.976l-4.25 5a.75.75 0 01-1.14 0l-4.25-5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+    </span>
+  </div>
+  <nav id="profileDropdown" class="dropdown" aria-label="Configurações do usuário" aria-hidden="true">
+    <a href="perfil.php" tabindex="-1">Perfil</a>
+    <a href="configuracoes.php" tabindex="-1">Configurações</a>
+    <a href="logout.php" tabindex="-1">Sair</a>
+  </nav>
+</header>
 
-        <section class="cards-grid" aria-label="Indicadores resumidos">
-            <article class="card" tabindex="0" role="region" aria-labelledby="total-indicadores">
-                <h3 id="total-indicadores">Total de Indicadores</h3>
-                <p id="totalIndicadores">–</p>
-            </article>
-            <article class="card" tabindex="0" role="region" aria-labelledby="preenchidos-indicadores">
-                <h3 id="preenchidos-indicadores">Indicadores Preenchidos</h3>
-                <p id="preenchidosIndicadores">–</p>
-            </article>
-            <article class="card" tabindex="0" role="region" aria-labelledby="pendentes-indicadores">
-                <h3 id="pendentes-indicadores">Indicadores Pendentes</h3>
-                <p id="pendentesIndicadores">–</p>
-            </article>
-        </section>
+<main>
+  <section id="loading" role="status" aria-live="polite">
+    <div class="spinner" aria-hidden="true"></div>
+    Carregando dados...
+  </section>
 
-        <canvas id="indicadoresChart" role="img" aria-label="Gráfico de pizza dos indicadores preenchidos e pendentes"></canvas>
+  <section id="cards-container" class="cards-grid" aria-label="Indicadores principais" tabindex="0" hidden>
+    <!-- Cards gerados dinamicamente -->
+  </section>
 
-        <section class="cards-indicadores" aria-label="Lista de indicadores detalhados">
-            <!-- Cards dos indicadores serão inseridos aqui pelo JS -->
-        </section>
-    </main>
+  <section id="chart-container" aria-label="Gráfico de preenchimento de indicadores" tabindex="0" hidden>
+    <canvas id="dashboardChart" role="img" aria-describedby="chartDescription"></canvas>
+    <div id="chartDescription" class="sr-only">Gráfico de barras mostrando a quantidade de indicadores preenchidos e pendentes.</div>
+  </section>
+</main>
 
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        async function carregarDashboard() {
-            try {
-                const res = await fetch('dashboard-data.php');
-                if (!res.ok) throw new Error('Falha ao carregar dados');
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  (() => {
+    const profileBtn = document.getElementById('profileMenuButton');
+    const profileDropdown = document.getElementById('profileDropdown');
 
-                const data = await res.json();
+    // Toggle dropdown acessível
+    profileBtn.addEventListener('click', () => {
+      const expanded = profileBtn.getAttribute('aria-expanded') === 'true';
+      profileBtn.setAttribute('aria-expanded', String(!expanded));
+      profileDropdown.setAttribute('aria-hidden', String(expanded));
+      if (!expanded) {
+        // Coloca foco no primeiro item do dropdown
+        profileDropdown.querySelector('a').focus();
+      }
+    });
 
-                if (data.error) {
-                    alert(data.error);
-                    return;
-                }
+    // Fecha dropdown ao clicar fora
+    document.addEventListener('click', (e) => {
+      if (!profileBtn.contains(e.target) && !profileDropdown.contains(e.target)) {
+        profileBtn.setAttribute('aria-expanded', 'false');
+        profileDropdown.setAttribute('aria-hidden', 'true');
+      }
+    });
 
-                // Atualiza os cards resumidos
-                document.getElementById('totalIndicadores').textContent = data.total;
-                document.getElementById('preenchidosIndicadores').textContent = data.preenchidos;
-                document.getElementById('pendentesIndicadores').textContent = data.pendentes;
+    // Fecha dropdown com ESC
+    profileDropdown.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        profileBtn.setAttribute('aria-expanded', 'false');
+        profileDropdown.setAttribute('aria-hidden', 'true');
+        profileBtn.focus();
+      }
+    });
+  })();
 
-                // Atualiza gráfico
-                const ctx = document.getElementById('indicadoresChart').getContext('2d');
+  async function carregarDashboard() {
+    const loading = document.getElementById('loading');
+    const cardsContainer = document.getElementById('cards-container');
+    const chartContainer = document.getElementById('chart-container');
 
-                // Se já existir gráfico, destrói antes para evitar duplicação
-                if (window.chartIndicadores) {
-                    window.chartIndicadores.destroy();
-                }
+    try {
+      loading.hidden = false;
+      cardsContainer.hidden = true;
+      chartContainer.hidden = true;
 
-                window.chartIndicadores = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Preenchidos', 'Pendentes'],
-                        datasets: [{
-                            label: 'Indicadores',
-                            data: [data.preenchidos, data.pendentes],
-                            backgroundColor: ['#64B5F6', '#1565C0'],
-                            borderColor: '#fff',
-                            borderWidth: 2,
-                            hoverOffset: 40,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        animation: {
-                            animateScale: true,
-                            duration: 1200,
-                        },
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: '#E3F2FD',
-                                    font: { size: 14, weight: 'bold' }
-                                }
-                            },
-                            tooltip: {
-                                enabled: true,
-                                callbacks: {
-                                    label: ctx => `${ctx.label}: ${ctx.parsed} indicadores`
-                                }
-                            }
-                        }
-                    }
-                });
+      const res = await fetch('dashboard-data.php');
+      if (!res.ok) throw new Error('Erro ao buscar dados');
 
-                // Lista de indicadores detalhados
-                const container = document.querySelector('.cards-indicadores');
-                container.innerHTML = '';
+      const data = await res.json();
 
-                if (data.indicadores.length === 0) {
-                    container.innerHTML = '<p style="text-align:center; color:#dbe9ff; font-style: italic;">Nenhum indicador encontrado.</p>';
-                } else {
-                    data.indicadores.forEach(ind => {
-                        const card = document.createElement('article');
-                        card.className = 'card-indicador';
-                        card.setAttribute('tabindex', '0');
-                        card.setAttribute('role', 'button');
-                        card.setAttribute('aria-pressed', 'false');
-                        card.setAttribute('aria-label', `Indicador ${ind.nome}, valor ${ind.valor}`);
+      // Esconde loading e mostra conteúdo
+      loading.hidden = true;
+      cardsContainer.hidden = false;
+      chartContainer.hidden = false;
 
-                        card.innerHTML = `
-                            <h4>${ind.nome}</h4>
-                            <span class="valor">${ind.valor.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-                        `;
+      // Preenche cards
+      cardsContainer.innerHTML = '';
+      data.indicadores.forEach(({id, nome, preenchidos, pendentes}) => {
+        const card = document.createElement('article');
+        card.className = 'card-indicador';
+        card.tabIndex = 0;
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', `${nome}: ${preenchidos} preenchidos, ${pendentes} pendentes`);
+        card.addEventListener('click', () => {
+          window.location.href = `detalhes-indicador.php?id=${id}`;
+        });
+        card.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            card.click();
+          }
+        });
+        card.innerHTML = `<p>${preenchidos}</p><span>${nome}</span>`;
+        cardsContainer.appendChild(card);
+      });
 
-                        card.addEventListener('click', () => {
-                            window.location.href = 'formulario-indicador.php?id=' + ind.id;
-                        });
-                        card.addEventListener('keydown', e => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                card.click();
-                            }
-                        });
+      // Gráfico
+      const ctx = document.getElementById('dashboardChart').getContext('2d');
 
-                        container.appendChild(card);
-                    });
-                }
+      // Destrói gráfico anterior se existir
+      if (window.myChart) window.myChart.destroy();
 
-            } catch (error) {
-                console.error(error);
-                alert('Erro ao carregar dados do painel.');
+      const totalPreenchidos = data.indicadores.reduce((acc, cur) => acc + cur.preenchidos, 0);
+      const totalPendentes = data.indicadores.reduce((acc, cur) => acc + cur.pendentes, 0);
+
+      if (totalPreenchidos + totalPendentes === 0) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        ctx.font = "18px 'Inter', sans-serif";
+        ctx.fillStyle = "var(--color-text-light)";
+        ctx.textAlign = "center";
+        ctx.fillText("Sem dados para exibir", ctx.canvas.width / 2, ctx.canvas.height / 2);
+        return;
+      }
+
+      window.myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Preenchidos', 'Pendentes'],
+          datasets: [{
+            label: 'Quantidade',
+            data: [totalPreenchidos, totalPendentes],
+            backgroundColor: ['var(--color-primary)', 'var(--color-error)'].map(c => getComputedStyle(document.documentElement).getPropertyValue(c).trim()),
+            borderRadius: 6,
+            maxBarThickness: 60,
+          }]
+        },
+        options: {
+          responsive: true,
+          animation: {duration: 800, easing: 'easeOutQuart'},
+          plugins: {
+            legend: {display: false},
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.parsed.y} indicadores`
+              }
             }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {stepSize: 1, color: getComputedStyle(document.documentElement).getPropertyValue('--color-text-light').trim()},
+              grid: {
+                color: 'rgba(255,255,255,0.2)'
+              }
+            },
+            x: {
+              ticks: {color: getComputedStyle(document.documentElement).getPropertyValue('--color-text-light').trim()},
+              grid: {
+                display: false
+              }
+            }
+          }
         }
+      });
 
-        // Carrega os dados ao abrir a página
-        window.addEventListener('DOMContentLoaded', carregarDashboard);
-    </script>
+    } catch (error) {
+      loading.innerHTML = `<div role="alert" style="color: var(--color-error); font-weight: 600;">
+        Falha ao carregar dados. Por favor, tente novamente.
+      </div>`;
+      console.error(error);
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', carregarDashboard);
+</script>
+
 </body>
 </html>

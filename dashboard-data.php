@@ -2,25 +2,30 @@
 session_start();
 header('Content-Type: application/json');
 
-// Verifica se o usuário está autenticado
+// ✅ SEGURANÇA: desativa cache de resposta JSON (bom para APIs privadas)
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Pragma: no-cache');
+
+// ✅ VERIFICAÇÃO DE SESSÃO
 if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
     http_response_code(403);
-    echo json_encode(['error' => 'Usuário não autenticado ou empresa não identificada']);
+    echo json_encode(['status' => 'error', 'message' => 'Usuário não autenticado ou empresa não identificada']);
     exit;
 }
 
+// ✅ CONEXÃO
 require_once __DIR__ . '/includes/conexao.php';
 
-$empresa_id = (int) $_SESSION['empresa_id'];
-
-if ($empresa_id <= 0) {
+// ✅ SANITIZAÇÃO
+$empresa_id = filter_var($_SESSION['empresa_id'], FILTER_VALIDATE_INT);
+if (!$empresa_id || $empresa_id <= 0) {
     http_response_code(400);
-    echo json_encode(['error' => 'ID da empresa inválido']);
+    echo json_encode(['status' => 'error', 'message' => 'ID da empresa inválido']);
     exit;
 }
 
 try {
-    // Consulta agregada de totais
+    // ✅ RESUMO DE INDICADORES
     $sqlResumo = "
         SELECT 
             COUNT(*) AS total,
@@ -36,8 +41,9 @@ try {
     $total = (int) ($resumo['total'] ?? 0);
     $preenchidos = (int) ($resumo['preenchidos'] ?? 0);
     $pendentes = (int) ($resumo['pendentes'] ?? 0);
+    $percentual = $total > 0 ? round(($preenchidos / $total) * 100, 1) : 0.0;
 
-    // Lista os indicadores
+    // ✅ LISTA DE INDICADORES
     $sqlLista = "
         SELECT 
             id, 
@@ -51,21 +57,20 @@ try {
     $stmt->execute([$empresa_id]);
     $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Retorno para consumo no front-end
+    // ✅ RESPOSTA FINAL
     echo json_encode([
         'status' => 'success',
-        'dados' => [
+        'data' => [
             'total' => $total,
             'preenchidos' => $preenchidos,
             'pendentes' => $pendentes,
-            'percentual_concluido' => $total > 0 ? round(($preenchidos / $total) * 100, 1) : 0.0,
+            'percentual_concluido' => $percentual,
             'indicadores' => $indicadores
         ]
     ]);
 
 } catch (PDOException $e) {
-    // Evita exibir detalhes internos ao usuário
-    error_log("Erro no dashboard: " . $e->getMessage());
+    error_log("Erro no dashboard-data.php: " . $e->getMessage()); // ✅ SEGURANÇA: log no servidor, não no cliente
     http_response_code(500);
-    echo json_encode(['error' => 'Erro interno no servidor']);
+    echo json_encode(['status' => 'error', 'message' => 'Erro interno no servidor']);
 }
