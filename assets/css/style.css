@@ -200,3 +200,26 @@ footer {
     font-size: 1.8rem;
   }
 }
+header {
+    background-color: var(--primary);
+  padding: 16px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+header img.logo-small {
+    height: 48px;
+    filter: drop-shadow(0 0 3px rgba(0,0,0,0.5));
+}
+
+header h1 {
+    color: white;
+  font-size: 1.8rem;
+  font-weight: 600;
+  user-select: none;
+}
