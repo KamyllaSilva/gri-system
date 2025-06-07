@@ -221,20 +221,20 @@ header h1 {
     font-weight: 600;
     flex-grow: 1;
   }
-header nav a.button {
-  background: var(--primary-light);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  transition: var(--transition);
-  text-transform: uppercase;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+nav {
+    display: flex;
+    gap: 1rem;
 }
 
-header nav a.button:hover {
-  background: var(--primary);
-  transform: scale(1.05);
-  box-shadow: 0 10px 25px rgba(30, 64, 175, 0.4);
+nav a {
+    color: #e0e7ff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+nav a:hover,
+nav a.active {
+    color: #ffffff;
+    text-decoration: underline;
 }
