@@ -7,6 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $senha = $_POST['senha'];
     $senha_confirm = $_POST['senha_confirm'];
+    $empresa = trim($_POST['empresa']);
 
     if ($senha !== $senha_confirm) {
         $_SESSION['error'] = "As senhas não coincidem.";
@@ -26,9 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Cria hash da senha
     $senha_hash = password_hash($senha, PASSWORD_DEFAULT);
 
-    // Insere usuário
-    $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, senha) VALUES (?, ?, ?)");
-    $stmt->execute([$nome, $email, $senha_hash]);
+    // Insere usuário com empresa
+    $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, senha, empresa) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$nome, $email, $senha_hash, $empresa]);
 
     // Redireciona para login com sucesso
     $_SESSION['success'] = "Cadastro realizado com sucesso. Faça login.";
