@@ -44,6 +44,14 @@ try {
     $stmt = $pdo->prepare($sqlLista);
     $stmt->execute([$empresa_id]);
     $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    file_put_contents(__DIR__ . '/resposta-debug.json', json_encode([
+    'total' => $total,
+    'preenchidos' => $preenchidos,
+    'pendentes' => $pendentes,
+    'indicadores' => $indicadores
+], JSON_PRETTY_PRINT));
+
 
     echo json_encode([
         'total' => $total,
