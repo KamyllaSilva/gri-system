@@ -1,3 +1,11 @@
+<?php
+session_start();
+if (!isset($_SESSION['usuario_id'])) {
+    header("Location: login.php");
+    exit();
+}
+?>
+
 <header>
     <img src="assets/img/logo.png" alt="Logo" class="logo-small" />
     <h1>Sistema GRI</h1>
