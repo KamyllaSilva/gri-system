@@ -1,8 +1,9 @@
 <?php
 session_start();
-header('Content-Type: application/json');
-header('Cache-Control: no-store, no-cache, must-revalidate');
-header('Pragma: no-cache');
+// Permitir CORS com cookies
+header("Access-Control-Allow-Origin: https://seu-front.railway.app"); // substitua pelo seu domínio
+header("Access-Control-Allow-Credentials: true");
+header("Content-Type: application/json");
 
 // ✅ VERIFICAÇÃO DE SESSÃO
 if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
