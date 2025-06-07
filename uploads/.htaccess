@@ -1,12 +1,7 @@
-
-// Impede execução de scripts dentro da pasta uploads para segurança
 <FilesMatch "\.(php|pl|py|jsp|asp|sh|cgi)$">
-    Order Deny,Allow
-    Deny from all
+    Require all denied
 </FilesMatch>
 
-// Permitir acesso apenas a arquivos estáticos
-<FilesMatch "\.(pdf|jpe?g|png|gif)$">
-    Order Allow,Deny
-    Allow from all
+<FilesMatch "\.(pdf|jpeg|png|gif)$">
+    Require all granted
 </FilesMatch>
