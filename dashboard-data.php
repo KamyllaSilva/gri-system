@@ -14,7 +14,7 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 // Corrigido: caminho para o novo local de conexao.php
-require_once __DIR__ . '/../includes/conexao.php';
+require_once __DIR__ . '/includes/conexao.php';
 
 // Pega o id da empresa do usuário logado
 $empresa_id = $_SESSION['empresa_id'] ?? null;
