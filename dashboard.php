@@ -362,7 +362,7 @@ if (!isset($_SESSION['usuario_id'])) {
             }
 
         } catch (error) {
-            console.error(error);
+            console.error (error);
             alert('Erro ao carregar dados do painel.');
         }
     }
