@@ -1,9 +1,10 @@
 <?php
 session_start();
+
 if (isset($_SESSION['usuario_id'])) {
-    header("Location: dashboard.php");
+    header("Location: frontend/pages/dashboard.php");
     exit();
-} else {
-    header("Location: login.php");
-    exit();
-}
+} 
+
+header("Location: frontend/pages/login.php");
+exit();
