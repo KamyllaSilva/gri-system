@@ -1,8 +1,8 @@
 <?php
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
 session_start();
 header('Content-Type: application/json');
 
@@ -13,8 +13,8 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
-// Inclui conexão com o banco
-require_once __DIR__ . '/../includes/conexao.php';
+// Corrigido: caminho para o novo local de conexao.php
+require_once __DIR__ . '/conexao.php';
 
 // Pega o id da empresa do usuário logado
 $empresa_id = $_SESSION['empresa_id'] ?? null;
@@ -45,8 +45,6 @@ try {
     $stmt->execute([$empresa_id]);
     $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Limpa buffer e envia JSON limpo
-    ob_clean();
     echo json_encode([
         'total' => $total,
         'preenchidos' => $preenchidos,
@@ -57,4 +55,3 @@ try {
     http_response_code(500);
     echo json_encode(['error' => 'Erro no servidor: ' . $e->getMessage()]);
 }
-?>
