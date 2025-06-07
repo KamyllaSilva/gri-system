@@ -1,8 +1,0 @@
-{
-  "build": {
-    "env": {
-      "RAILWAY_STATIC_PATH": "public"
-    },
-    "dockerfilePath": "Dockerfile"
-  }
-}

@@ -1,20 +1,22 @@
-# Usa imagem do PHP com Apache embutido
 FROM php:8.2-apache
 
 # Instala extensões necessárias
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Define nova DocumentRoot
-ENV APACHE_DOCUMENT_ROOT /var/www/html/public
-
-# Atualiza VirtualHost para apontar pra 'public'
-RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
-
-# Ativa mod_rewrite (opcional para URLs amigáveis)
+# Ativa mod_rewrite
 RUN a2enmod rewrite
 
-# Copia os arquivos do projeto para o container
-COPY . /var/www/html
+# Copia o código para a pasta padrão do apache
+COPY . /var/www/html/
 
-# Expõe a porta 80
-EXPOSE 80
+# Define permissões para uploads
+RUN mkdir -p /var/www/html/uploads && chown -R www-data:www-data /var/www/html/uploads
+
+# Configura permissão escrita para a pasta uploads
+RUN chmod -R 755 /var/www/html/uploads
+
+# Exponha porta 8080 (Railway usa 8080)
+EXPOSE 8080
+
+# Apache rodando em foreground
+CMD ["apache2-foreground"]
