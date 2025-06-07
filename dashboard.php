@@ -266,7 +266,7 @@ if (!isset($_SESSION['usuario_id'])) {
             try {
                 const res = await fetch('dashboard-data.php',{
                     method: 'GET',
-                    credentials: 'include',
+                    credentials: 'same-origin',
             });
                 if (!res.ok) throw new Error('Falha ao carregar dados');
 

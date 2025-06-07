@@ -44,21 +44,17 @@ try {
     $stmt = $pdo->prepare($sqlLista);
     $stmt->execute([$empresa_id]);
     $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
-    file_put_contents(__DIR__ . '/resposta-debug.json', json_encode([
-    'total' => $total,
-    'preenchidos' => $preenchidos,
-    'pendentes' => $pendentes,
-    'indicadores' => $indicadores
-], JSON_PRETTY_PRINT));
 
-
-    echo json_encode([
+    $response = [
         'total' => $total,
         'preenchidos' => $preenchidos,
         'pendentes' => $pendentes,
         'indicadores' => $indicadores
-    ]);
+    ];
+
+    // Envia resposta ao frontend
+    echo json_encode($response);
+
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Erro no servidor: ' . $e->getMessage()]);
