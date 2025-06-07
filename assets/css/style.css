@@ -219,4 +219,22 @@ header img.logo-small {
 header h1 {
    font-size: 1.5rem;
     font-weight: 600;
-    flex-grow: 1;}
+    flex-grow: 1;
+  }
+header nav a.button {
+  background: var(--primary-light);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: var(--transition);
+  text-transform: uppercase;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+header nav a.button:hover {
+  background: var(--primary);
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(30, 64, 175, 0.4);
+}
