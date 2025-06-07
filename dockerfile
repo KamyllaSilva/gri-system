@@ -8,7 +8,7 @@ RUN docker-php-ext-install mysqli
 RUN a2enmod rewrite
 
 # Copiar todo o backend para o diretório raiz do Apache
-COPY backend/ /var/www/html/
+COPY backend/ /var/www/html/api/
 
 # Copiar frontend para pasta pública do Apache
 COPY frontend/ /var/www/html/
