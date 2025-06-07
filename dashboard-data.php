@@ -1,4 +1,5 @@
 <?php
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -13,28 +14,28 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 // Inclui conexão com o banco
-require_once __DIR__ .'/conexao.php';
+require_once __DIR__ . '/../includes/conexao.php';
 
 // Pega o id da empresa do usuário logado
 $empresa_id = $_SESSION['empresa_id'] ?? 0;
 
 try {
-    $sqlTotal = "SELECT COUNT(*) FROM indicadores WHERE empresa_id = ?";
+    $sqlTotal = "SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ?";
     $stmt = $pdo->prepare($sqlTotal);
     $stmt->execute([$empresa_id]);
     $total = (int)$stmt->fetchColumn();
 
-    $sqlPreenchidos = "SELECT COUNT(*) FROM indicadores WHERE empresa_id = ? AND preenchido = 1";
+    $sqlPreenchidos = "SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ? AND preenchido = 1";
     $stmt = $pdo->prepare($sqlPreenchidos);
     $stmt->execute([$empresa_id]);
     $preenchidos = (int)$stmt->fetchColumn();
 
-    $sqlPendentes = "SELECT COUNT(*) FROM indicadores WHERE empresa_id = ? AND preenchido = 0";
+    $sqlPendentes = "SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ? AND preenchido = 0";
     $stmt = $pdo->prepare($sqlPendentes);
     $stmt->execute([$empresa_id]);
     $pendentes = (int)$stmt->fetchColumn();
 
-    $sqlLista = "SELECT id, nome, valor FROM indicadores WHERE empresa_id = ?";
+    $sqlLista = "SELECT id, nome, valor FROM respostas_indicadores WHERE empresa_id = ?";
     $stmt = $pdo->prepare($sqlLista);
     $stmt->execute([$empresa_id]);
     $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
