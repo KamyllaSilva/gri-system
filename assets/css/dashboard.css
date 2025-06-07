@@ -1,0 +1,188 @@
+/* Reset e fontes base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f5f8fc;
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Cabeçalho */
+header {
+    background-color: #1e3a8a;
+    color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+header .logo-small {
+    width: 40px;
+    height: auto;
+    margin-right: 1rem;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    flex-grow: 1;
+}
+
+nav {
+    display: flex;
+    gap: 1rem;
+}
+
+nav a {
+    color: #e0e7ff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+nav a:hover,
+nav a.active {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* Conteúdo principal */
+main.container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Título e saudação */
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+
+.dashboard-header h2 {
+    font-size: 1.8rem;
+    color: #1e3a8a;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-header p {
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Cartões principais */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.card {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(30, 58, 138, 0.15);
+}
+
+.card h3 {
+    font-size: 1rem;
+    color: #1e3a8a;
+    margin-bottom: 0.5rem;
+}
+
+.card p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2563eb;
+}
+
+/* Gráfico */
+#indicadoresChart {
+    max-width: 500px;
+    margin: 2rem auto;
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Lista de indicadores detalhados */
+.cards-indicadores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.card-indicador {
+    background-color: #ffffff;
+    padding: 1.2rem;
+    border-left: 5px solid #1e3a8a;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.card-indicador:hover {
+    background-color: #f0f4ff;
+}
+
+.card-indicador h4 {
+    font-size: 1rem;
+    color: #1e3a8a;
+    margin-bottom: 0.3rem;
+}
+
+.card-indicador .valor {
+    font-size: 1.3rem;
+    color: #2563eb;
+    font-weight: 600;
+}
+
+/* Indicador sem dados */
+.sem-indicadores {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-style: italic;
+    color: #777;
+    margin-top: 1rem;
+}
+
+/* Responsivo extra */
+@media (max-width: 600px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    nav {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    nav a {
+        padding-left: 0.5rem;
+    }
+
+    #indicadoresChart {
+        width: 100%;
+    }
+}

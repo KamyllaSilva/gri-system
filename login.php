@@ -1,56 +1,66 @@
 <?php
+declare(strict_types=1);
 session_start();
 require_once 'includes/db.php';
 
 $erro = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email']);
-    $senha = $_POST['senha'];
+    $email = trim($_POST['email'] ?? '');
+    $senha = $_POST['senha'] ?? '';
 
-    $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
-    $stmt->execute([$email]);
-    $usuario = $stmt->fetch();
+    if ($email && $senha) {
+        $stmt = $pdo->prepare("SELECT * FROM usuarios WHERE email = ?");
+        $stmt->execute([$email]);
+        $usuario = $stmt->fetch();
 
-    if ($usuario && password_verify($senha, $usuario['senha'])) {
-        $_SESSION['usuario_id'] = $usuario['id'];
-        $_SESSION['usuario_nome'] = $usuario['nome'];
-        $_SESSION['usuario_tipo'] = $usuario['tipo'];
-        $_SESSION['empresa_id'] = $usuario['empresa_id'];
+        if ($usuario && password_verify($senha, $usuario['senha'])) {
+            session_regenerate_id(true); // Segurança contra fixação de sessão
 
-        header("Location: dashboard.php");
-        exit;
+            $_SESSION['usuario_id'] = $usuario['id'];
+            $_SESSION['usuario_nome'] = $usuario['nome'];
+            $_SESSION['usuario_tipo'] = $usuario['tipo'];
+            $_SESSION['empresa_id'] = $usuario['empresa_id'];
+
+            header("Location: dashboard.php");
+            exit;
+        } else {
+            $erro = "E-mail ou senha inválidos.";
+        }
     } else {
-        $erro = "Usuário ou senha inválidos.";
+        $erro = "Preencha todos os campos.";
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <title>Login - Sistema GRI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/css/style.css"> <!-- opcional -->
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: linear-gradient(to right, #004080, #007BFF);
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #004080, #007BFF);
             display: flex;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
+            color: #333;
         }
 
         .login-container {
             background: #fff;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            padding: 40px 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
         }
 
         .login-container h2 {
@@ -62,11 +72,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 12px 10px;
-            margin: 10px 0 20px;
+            padding: 12px 14px;
+            margin-bottom: 18px;
             border: 1px solid #ccc;
             border-radius: 8px;
-            font-size: 16px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #007BFF;
+            outline: none;
         }
 
         button {
@@ -77,8 +93,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: none;
             border-radius: 8px;
             font-weight: bold;
-            cursor: pointer;
             font-size: 16px;
+            cursor: pointer;
             transition: background-color 0.3s ease;
         }
 
@@ -87,9 +103,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .error {
-            color: red;
+            background: #ffdede;
+            color: #a70000;
+            padding: 10px;
+            border-radius: 8px;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
         }
 
         .register-link {
@@ -117,8 +137,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="error"><?= htmlspecialchars($erro) ?></div>
     <?php endif; ?>
 
-    <form method="POST">
-        <input type="email" name="email" placeholder="Seu e-mail" required>
+    <form method="POST" autocomplete="off">
+        <input type="email" name="email" placeholder="Seu e-mail" required autofocus>
         <input type="password" name="senha" placeholder="Sua senha" required>
         <button type="submit">Entrar</button>
     </form>

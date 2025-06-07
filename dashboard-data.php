@@ -6,17 +6,17 @@ error_reporting(E_ALL);
 session_start();
 header('Content-Type: application/json');
 
-// Verifica se usuário está logado
+// Verifica autenticação
 if (!isset($_SESSION['usuario_id'])) {
     http_response_code(403);
     echo json_encode(['error' => 'Usuário não autenticado']);
     exit;
 }
 
-// Corrigido: caminho para o novo local de conexao.php
+// Conexão
 require_once __DIR__ . '/conexao.php';
 
-// Pega o id da empresa do usuário logado
+// Verifica se a empresa está definida
 $empresa_id = $_SESSION['empresa_id'] ?? null;
 if (!$empresa_id) {
     http_response_code(403);
@@ -24,36 +24,30 @@ if (!$empresa_id) {
     exit;
 }
 
+// Função de contagem reutilizável
+function contarIndicadores($pdo, $empresa_id, $condicaoExtra = '') {
+    $sql = "SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ?" . $condicaoExtra;
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$empresa_id]);
+    return (int)$stmt->fetchColumn();
+}
+
 try {
-    $sqlTotal = "SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ?";
-    $stmt = $pdo->prepare($sqlTotal);
-    $stmt->execute([$empresa_id]);
-    $total = (int)$stmt->fetchColumn();
+    $total = contarIndicadores($pdo, $empresa_id);
+    $preenchidos = contarIndicadores($pdo, $empresa_id, " AND preenchido = 1");
+    $pendentes = contarIndicadores($pdo, $empresa_id, " AND preenchido = 0");
 
-    $sqlPreenchidos = "SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ? AND preenchido = 1";
-    $stmt = $pdo->prepare($sqlPreenchidos);
-    $stmt->execute([$empresa_id]);
-    $preenchidos = (int)$stmt->fetchColumn();
-
-    $sqlPendentes = "SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ? AND preenchido = 0";
-    $stmt = $pdo->prepare($sqlPendentes);
-    $stmt->execute([$empresa_id]);
-    $pendentes = (int)$stmt->fetchColumn();
-
-    $sqlLista = "SELECT id, nome, valor FROM respostas_indicadores WHERE empresa_id = ?";
+    $sqlLista = "SELECT id, nome, COALESCE(valor, '') AS valor FROM respostas_indicadores WHERE empresa_id = ? ORDER BY nome ASC";
     $stmt = $pdo->prepare($sqlLista);
     $stmt->execute([$empresa_id]);
     $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $response = [
+    echo json_encode([
         'total' => $total,
         'preenchidos' => $preenchidos,
         'pendentes' => $pendentes,
         'indicadores' => $indicadores
-    ];
-
-    // Envia resposta ao frontend
-    echo json_encode($response);
+    ]);
 
 } catch (PDOException $e) {
     http_response_code(500);
