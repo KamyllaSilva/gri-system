@@ -12,7 +12,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
 }
 
 // ✅ CONEXÃO
-require_once __DIR__ . '/includes/conexao.php'; // certifique-se que $pdo está sendo criado dentro desse arquivo
+require_once __DIR__ . '/.../includes/conexao.php'; // certifique-se que $pdo está sendo criado dentro desse arquivo
 
 if (!isset($pdo) || !$pdo instanceof PDO) {
     http_response_code(500);
