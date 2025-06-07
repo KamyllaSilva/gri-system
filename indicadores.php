@@ -21,7 +21,7 @@ try {
     die("Erro ao conectar ao banco: " . $e->getMessage());
 }
 ?>
-<?php include('header.php'); ?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -30,33 +30,37 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
-    
 </head>
 <body>
 
-    <main class="container">
-        <section class="form-section">
-            <h2>Preenchimento de Indicadores</h2>
-            <form method="POST" action="salvar_indicador.php" enctype="multipart/form-data">
-                <label for="indicador_id">Indicador GRI</label>
-                <select name="indicador_id" id="indicador_id" required>
-                    <option value="">Selecione...</option>
-                    <?php foreach ($indicadores as $ind): ?>
-                        <option value="<?= $ind['id'] ?>">
-                            <?= $ind['codigo'] ?> - <?= htmlspecialchars($ind['descricao']) ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
+<?php include('header.php'); ?>
 
-                <label for="resposta">Resposta</label>
-                <textarea name="resposta" id="resposta" rows="6" required></textarea>
+<main class="container">
+    <section class="form-section">
+        <h2>Preenchimento de Indicadores</h2>
+        <form method="POST" action="salvar_indicador.php" enctype="multipart/form-data">
+            <label for="indicador_id">Indicador GRI</label>
+            <select name="indicador_id" id="indicador_id" required>
+                <option value="">Selecione...</option>
+                <?php foreach ($indicadores as $ind): ?>
+                    <option value="<?= $ind['id'] ?>">
+                        <?= $ind['codigo'] ?> - <?= htmlspecialchars($ind['descricao']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
 
-                <label for="arquivo">Anexar Evidência</label>
-                <input type="file" name="arquivo" id="arquivo">
+            <label for="resposta">Resposta</label>
+            <textarea name="resposta" id="resposta" rows="6" required></textarea>
 
-                <button type="submit">Salvar Indicador</button>
-            </form>
-        </section>
-    </main>
+            <label for="arquivo">Anexar Evidência</label>
+            <input type="file" name="arquivo" id="arquivo">
+
+            <button type="submit">Salvar Indicador</button>
+        </form>
+    </section>
+</main>
+
+<?php include('footer.php'); ?>
+
 </body>
 </html>
