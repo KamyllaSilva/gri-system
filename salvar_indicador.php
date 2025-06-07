@@ -4,9 +4,8 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Verifica se o usuário está autenticado
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location: login.php");
-    exit();
+if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
+    die(json_encode(["error" => "Usuário ou empresa não autenticado."]));
 }
 
 // Verifica se a requisição é POST
@@ -33,6 +32,7 @@ try {
 $indicador_id = $_POST['indicador_id'] ?? null;
 $resposta = trim($_POST['resposta'] ?? '');
 $usuario_id = $_SESSION['usuario_id'];
+$empresa_id = $_SESSION['empresa_id'];
 $caminho_arquivo = null;
 
 // Upload do arquivo (se houver)
@@ -53,11 +53,15 @@ if (isset($_FILES['arquivo']) && $_FILES['arquivo']['error'] === UPLOAD_ERR_OK) 
 }
 
 // Inserção no banco
-$sql = "INSERT INTO respostas_indicadores (indicador_id, resposta, evidencia, criado_por, status)
-        VALUES (?, ?, ?, ?, 'preenchido')";
-$stmt = $pdo->prepare($sql);
-$stmt->execute([$indicador_id, $resposta, $caminho_arquivo, $usuario_id]);
+$sql = "INSERT INTO respostas_indicadores (indicador_id, resposta, evidencia, criado_por, empresa_id, status)
+        VALUES (?, ?, ?, ?, ?, 'preenchido')";
 
-header("Location: indicadores.php?sucesso=1");
-exit();
+try {
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$indicador_id, $resposta, $caminho_arquivo, $usuario_id, $empresa_id]);
+    header("Location: indicadores.php?sucesso=1");
+    exit();
+} catch (PDOException $e) {
+    die("Erro ao salvar resposta: " . $e->getMessage());
+}
 ?>
