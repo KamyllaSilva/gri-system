@@ -21,7 +21,7 @@ try {
     die("Erro ao conectar ao banco: " . $e->getMessage());
 }
 ?>
-
+<?php include('header.php'); ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -33,16 +33,6 @@ try {
     
 </head>
 <body>
-    <header class="header">
-        <img src="assets/img/logo.png" alt="Logo" class="logo-small">
-        <h1>Sistema GRI</h1>
-        <nav>
-            <a href="dashboard.php">Painel</a>
-            <a href="indicadores.php">Indicadores</a>
-            <a href="usuarios.php">Usuários</a>
-            <a href="logout.php">Sair</a>
-        </nav>
-    </header>
 
     <main class="container">
         <section class="form-section">
