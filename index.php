@@ -8,126 +8,135 @@ if (isset($_SESSION['usuario_id'])) {
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Sistema GRI | Gestão Profissional de Indicadores</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet" />
-<link rel="icon" href="assets/img/favicon.ico" type="image/x-icon" />
-<style>
-    :root {
-        --azul: #004080;
-        --azul-claro: #2563eb;
-        --fundo: #f4f7fc;
-        --branco: #ffffff;
-        --texto: #333;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Sistema GRI para gestão profissional de indicadores de sustentabilidade." />
+    <title>Sistema GRI | Gestão Profissional de Indicadores</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet" />
+    <link rel="icon" href="assets/img/favicon.ico" type="image/x-icon" />
+    <style>
+        :root {
+            --azul: #004080;
+            --azul-claro: #2563eb;
+            --fundo: #f4f7fc;
+            --branco: #ffffff;
+            --texto: #333;
+        }
 
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    body {
-        font-family: 'Poppins', sans-serif;
-        background: var(--fundo);
-        color: var(--texto);
-        line-height: 1.6;
-        display: flex;
-        flex-direction: column;
-        min-height: 100vh;
-    }
-
-    header {
-        background-color: var(--azul);
-        color: white;
-        padding: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    header h1 {
-        font-size: 1.8rem;
-    }
-
-    header nav a.button {
-        background-color: var(--branco);
-        color: var(--azul);
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: bold;
-        text-decoration: none;
-        transition: background 0.3s;
-    }
-
-    header nav a.button:hover {
-        background-color: var(--azul-claro);
-        color: white;
-    }
-
-    main {
-        flex: 1;
-        padding: 30px 20px;
-        max-width: 900px;
-        margin: 0 auto;
-    }
-
-    section {
-        margin-bottom: 40px;
-        background: white;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-
-    section h2 {
-        display: flex;
-        align-items: center;
-        font-size: 1.4rem;
-        margin-bottom: 15px;
-        color: var(--azul);
-        gap: 10px;
-    }
-
-    section p, section ul {
-        font-size: 1rem;
-        color: #444;
-    }
-
-    section ul {
-        margin-top: 10px;
-        padding-left: 20px;
-    }
-
-    section ul li {
-        margin-bottom: 8px;
-    }
-
-    footer {
-        background-color: var(--azul);
-        color: white;
-        text-align: center;
-        padding: 15px;
-        font-size: 0.9rem;
-    }
-
-    @media (max-width: 600px) {
-        header {
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--fundo);
+            color: var(--texto);
+            line-height: 1.6;
+            display: flex;
             flex-direction: column;
-            text-align: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--azul);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
         header h1 {
-            margin-bottom: 10px;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        header nav a.button {
+            background-color: var(--branco);
+            color: var(--azul);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        header nav a.button:hover {
+            background-color: var(--azul-claro);
+            color: white;
+            transform: scale(1.05);
         }
 
         main {
-            padding: 20px 15px;
+            flex: 1;
+            padding: 30px 20px;
+            max-width: 900px;
+            margin: 0 auto;
         }
-    }
-</style>
+
+        section {
+            margin-bottom: 40px;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s;
+        }
+
+        section:hover {
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        section h2 {
+            display: flex;
+            align-items: center;
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            color: var(--azul);
+            gap: 10px;
+        }
+
+        section p, section ul {
+            font-size: 1rem;
+            color: #444;
+        }
+
+        section ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+
+        section ul li {
+            margin-bottom: 8px;
+        }
+
+        footer {
+            background-color: var(--azul);
+            color: white;
+            text-align: center;
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            header h1 {
+                margin-bottom: 10px;
+            }
+
+            main {
+                padding: 20px 15px;
+            }
+        }
+    </style>
 </head>
 <body>
 <header>
@@ -192,7 +201,7 @@ if (isset($_SESSION['usuario_id'])) {
 </main>
 
 <footer>
-  &copy; <?= date('Y') ?> Sistema GRI — Projeto Acadêmico &mdash; Desenvolvido por você
+    &copy; <?= date('Y') ?> Sistema GRI — Projeto Acadêmico &mdash; Desenvolvido por você
 </footer>
 </body>
 </html>
