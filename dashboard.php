@@ -260,115 +260,112 @@ if (!isset($_SESSION['usuario_id'])) {
     </main>
 
     <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        async function carregarDashboard() {
-            try {
-                const res = await fetch('dashboard-data.php',{
-                    method: 'GET',
-                    credentials: 'same-origin',
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    async function carregarDashboard() {
+        try {
+            const res = await fetch('dashboard-data.php', {
+                method: 'GET',
+                credentials: 'same-origin',
             });
-                if (!res.ok) throw new Error('Falha ao carregar dados');
 
-                const data = await res.json();
+            if (!res.ok) throw new Error('Falha ao carregar dados');
 
-                if (data.error) {
-                    alert(data.error);
-                    return;
-                }
+            const data = await res.json();
 
-                // Atualiza os cards resumidos
-                document.getElementById('totalIndicadores').textContent = data.total;
-                document.getElementById('preenchidosIndicadores').textContent = data.preenchidos;
-                document.getElementById('pendentesIndicadores').textContent = data.pendentes;
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
 
-                // Atualiza gráfico
-                const ctx = document.getElementById('indicadoresChart').getContext('2d');
+            // Atualiza os cards resumidos
+            document.getElementById('totalIndicadores').textContent = data.total;
+            document.getElementById('preenchidosIndicadores').textContent = data.preenchidos;
+            document.getElementById('pendentesIndicadores').textContent = data.pendentes;
 
-                // Se já existir gráfico, destrói antes para evitar duplicação
-                if (window.chartIndicadores) {
-                    window.chartIndicadores.destroy();
-                }
+            // Atualiza gráfico
+            const ctx = document.getElementById('indicadoresChart').getContext('2d');
 
-                window.chartIndicadores = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Preenchidos', 'Pendentes'],
-                        datasets: [{
-                            label: 'Indicadores',
-                            data: [data.preenchidos, data.pendentes],
-                            backgroundColor: ['#64B5F6', '#1565C0'],
-                            borderColor: '#fff',
-                            borderWidth: 2,
-                            hoverOffset: 40,
-                        }]
+            if (window.chartIndicadores) {
+                window.chartIndicadores.destroy();
+            }
+
+            window.chartIndicadores = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Preenchidos', 'Pendentes'],
+                    datasets: [{
+                        label: 'Indicadores',
+                        data: [data.preenchidos, data.pendentes],
+                        backgroundColor: ['#64B5F6', '#1565C0'],
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                        hoverOffset: 40,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    animation: {
+                        animateScale: true,
+                        duration: 1200,
                     },
-                    options: {
-                        responsive: true,
-                        animation: {
-                            animateScale: true,
-                            duration: 1200,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#E3F2FD',
+                                font: { size: 14, weight: 'bold' }
+                            }
                         },
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: '#E3F2FD',
-                                    font: { size: 14, weight: 'bold' }
-                                }
-                            },
-                            tooltip: {
-                                enabled: true,
-                                callbacks: {
-                                    label: ctx => ${ctx.label}: ${ctx.parsed} indicadores
-                                }
+                        tooltip: {
+                            enabled: true,
+                            callbacks: {
+                                label: ctx => `${ctx.label}: ${ctx.parsed} indicadores`
                             }
                         }
                     }
-                });
-
-                // Lista de indicadores detalhados
-                const container = document.querySelector('.cards-indicadores');
-                container.innerHTML = '';
-
-                if (data.indicadores.length === 0) {
-                    container.innerHTML = '<p style="text-align:center; color:#dbe9ff; font-style: italic;">Nenhum indicador encontrado.</p>';
-                } else {
-                    data.indicadores.forEach(ind => {
-                        const card = document.createElement('article');
-                        card.className = 'card-indicador';
-                        card.setAttribute('tabindex', '0');
-                        card.setAttribute('role', 'button');
-                        card.setAttribute('aria-pressed', 'false');
-                        card.setAttribute('aria-label', Indicador ${ind.nome}, valor ${ind.valor});
-
-                        card.innerHTML = 
-                            <h4>${ind.nome}</h4>
-                            <span class="valor">${ind.valor.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-                        ;
-
-                        card.addEventListener('click', () => {
-                            window.location.href = 'formulario-indicador.php?id=' + ind.id;
-                        });
-                        card.addEventListener('keydown', e => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                card.click();
-                            }
-                        });
-
-                        container.appendChild(card);
-                    });
                 }
+            });
 
-            } catch (error) {
-                console.error(error);
-                alert('Erro ao carregar dados do painel.');
+            // Lista de indicadores detalhados
+            const container = document.querySelector('.cards-indicadores');
+            container.innerHTML = '';
+
+            if (data.indicadores.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#dbe9ff; font-style: italic;">Nenhum indicador encontrado.</p>';
+            } else {
+                data.indicadores.forEach(ind => {
+                    const card = document.createElement('article');
+                    card.className = 'card-indicador';
+                    card.setAttribute('tabindex', '0');
+                    card.setAttribute('role', 'button');
+                    card.setAttribute('aria-pressed', 'false');
+                    card.setAttribute('aria-label', `Indicador ${ind.nome}, valor ${ind.valor}`);
+
+                    card.innerHTML = `
+                        <h4>${ind.nome}</h4>
+                        <span class="valor">${ind.valor.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    `;
+
+                    card.addEventListener('click', () => {
+                        window.location.href = 'formulario-indicador.php?id=' + ind.id;
+                    });
+                    card.addEventListener('keydown', e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            card.click();
+                        }
+                    });
+
+                    container.appendChild(card);
+                });
             }
-        }
 
-        // Carrega os dados ao abrir a página
-        window.addEventListener('DOMContentLoaded', carregarDashboard);
-    </script>
-</body>
-</html>
+        } catch (error) {
+            console.error(error);
+            alert('Erro ao carregar dados do painel.');
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', carregarDashboard);
+</script>
