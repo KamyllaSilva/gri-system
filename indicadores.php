@@ -30,6 +30,30 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>header {
+            background: #093170;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
+
+        header img.logo-small {
+            height: 48px;
+            filter: drop-shadow(0 0 3px rgba(0,0,0,0.5));
+        }
+
+        header h1 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            user-select: none;
+            flex-grow: 1;
+            margin-left: 15px;
+            color: #BBDEFB;
+        }
+        </style>
 </head>
 <body>
     <header class="header">
