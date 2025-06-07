@@ -32,9 +32,16 @@ try {
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-
-<?php include('header.php'); ?>
-
+<header>
+        <img src="assets/css/img/logo.png" alt="Logo" class="logo-small" />
+        <h1>Sistema GRI</h1>
+        <nav>
+            <a href="dashboard.php" class="active">Painel</a>
+            <a href="indicadores.php">Indicadores</a>
+            <a href="usuarios.php">Usuários</a>
+            <a href="logout.php">Sair</a>
+        </nav>
+    </header>
 <main class="container">
     <section class="form-section">
         <h2>Preenchimento de Indicadores</h2>
