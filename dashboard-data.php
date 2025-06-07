@@ -13,7 +13,7 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 // Inclui conexão com o banco
-require_once __DIR__ . './includes/conexao.php';
+require_once __DIR__ .'/includes/conexao.php';
 
 // Pega o id da empresa do usuário logado
 $empresa_id = $_SESSION['empresa_id'] ?? 0;
