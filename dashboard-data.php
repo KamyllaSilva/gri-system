@@ -17,7 +17,12 @@ if (!isset($_SESSION['usuario_id'])) {
 require_once __DIR__ . '/../includes/conexao.php';
 
 // Pega o id da empresa do usuário logado
-$empresa_id = $_SESSION['empresa_id'] ?? 0;
+$empresa_id = $_SESSION['empresa_id'] ?? null;
+if (!$empresa_id) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Empresa não especificada']);
+    exit;
+}
 
 try {
     $sqlTotal = "SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ?";
