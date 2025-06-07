@@ -1,0 +1,16 @@
+{
+    "name": "kamyl/gri-system",
+    "description": "Sistema de indicadores GRI",
+    "autoload": {
+        "psr-4": {
+            "Kamyl\\GriSystem\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "KamyllaSilva",
+            "email": "silvakamylla670@gmail.com"
+        }
+    ],
+    "require": {}
+}
