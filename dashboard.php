@@ -264,7 +264,10 @@ if (!isset($_SESSION['usuario_id'])) {
     <script>
         async function carregarDashboard() {
             try {
-                const res = await fetch('dashboard-data.php');
+                const res = await fetch('dashboard-data.php',{
+                    method: 'GET',
+                    credentials: 'same-origin',
+            });
                 if (!res.ok) throw new Error('Falha ao carregar dados');
 
                 const data = await res.json();
