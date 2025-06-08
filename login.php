@@ -4,7 +4,6 @@ session_start();
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 
-
 $erro = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -18,12 +17,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($usuario && password_verify($senha, $usuario['senha'])) {
             session_regenerate_id(true); // Segurança contra fixação de sessão
-$_SESSION['usuario_id'] = $usuario['id'];
-$_SESSION['nome']        = $usuario['nome'];
-$_SESSION['tipo']        = $usuario['tipo'];
-$_SESSION['empresa_id']  = $usuario['empresa_id'];
+            $_SESSION['usuario_id'] = $usuario['id'];
+            $_SESSION['nome']        = $usuario['nome'];
+            $_SESSION['tipo']        = $usuario['tipo'];
+            $_SESSION['empresa_id']  = $usuario['empresa_id'];
 
-            header("Location: dashboard.php");
+            header("Location: /dashboard.php"); // Corrigido para caminho absoluto na raiz
             exit;
         } else {
             $erro = "E-mail ou senha inválidos.";
@@ -144,9 +143,6 @@ $_SESSION['empresa_id']  = $usuario['empresa_id'];
         <button type="submit">Entrar</button>
     </form>
 
-    <div class="register-link">
-        Ainda não tem conta? <a href="register.php">Cadastre-se</a>
-    </div>
 </div>
 
 </body>
