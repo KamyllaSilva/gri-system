@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['tipo']        = $usuario['tipo'];
             $_SESSION['empresa_id']  = $usuario['empresa_id'];
 
-            header("Location: /dashboard.php"); // Corrigido para caminho absoluto na raiz
+            header("Location: dashboard.php"); // Corrigido para caminho absoluto na raiz
             exit;
         } else {
             $erro = "E-mail ou senha inválidos.";
