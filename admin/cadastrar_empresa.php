@@ -1,6 +1,8 @@
 <?php
 session_start();
+require_once 'includes/admin_only.php';
 require_once '../includes/db.php'; // ajuste o caminho conforme seu projeto
+
 
 // 1. Verificar se usuário está logado e é admin
 if (!isset($_SESSION['tipo']) || $_SESSION['tipo'] !== 'admin') {

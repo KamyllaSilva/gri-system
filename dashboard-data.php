@@ -3,7 +3,13 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+// Inicia a sessão antes de usar $_SESSION
 session_start();
+
+// Inclui o arquivo de autenticação
+require_once 'includes/auth.php';
+
+// Define o tipo de retorno como JSON
 header('Content-Type: application/json');
 
 // Verifica autenticação
@@ -13,7 +19,7 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
-// Conexão
+// Conexão com o banco
 require_once __DIR__ . '/conexao.php';
 
 // Verifica se a empresa está definida
@@ -24,8 +30,8 @@ if (!$empresa_id) {
     exit;
 }
 
-// Função de contagem reutilizável
-function contarIndicadores($pdo, $empresa_id, $condicaoExtra = '') {
+// Função para contar indicadores
+function contarIndicadores($pdo, $empresa_id, $condicaoExtra = ''): int {
     $sql = "SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ?" . $condicaoExtra;
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$empresa_id]);
@@ -37,18 +43,19 @@ try {
     $preenchidos = contarIndicadores($pdo, $empresa_id, " AND preenchido = 1");
     $pendentes = contarIndicadores($pdo, $empresa_id, " AND preenchido = 0");
 
+    // Buscar indicadores detalhados
     $sqlLista = "SELECT id, nome, COALESCE(valor, '') AS valor FROM respostas_indicadores WHERE empresa_id = ? ORDER BY nome ASC";
     $stmt = $pdo->prepare($sqlLista);
     $stmt->execute([$empresa_id]);
     $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Resposta JSON
     echo json_encode([
         'total' => $total,
         'preenchidos' => $preenchidos,
         'pendentes' => $pendentes,
         'indicadores' => $indicadores
     ]);
-
 } catch (PDOException $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Erro no servidor: ' . $e->getMessage()]);

@@ -1,11 +1,9 @@
 <?php
 session_start();
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location: login.php");
-    exit();
-}
-?>
+require_once 'includes/auth.php'; // ✅ Verific
 
+
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -77,86 +75,80 @@ if (!isset($_SESSION['usuario_id'])) {
                 document.getElementById('preenchidosIndicadores').textContent = data.preenchidos;
                 document.getElementById('pendentesIndicadores').textContent = data.pendentes;
 
-                const ctx = document.getElementById('indicadoresChart').getContext('2d');
-
-                if (window.chartIndicadores) {
-                    window.chartIndicadores.destroy();
-                }
-
-                window.chartIndicadores = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Preenchidos', 'Pendentes'],
-                        datasets: [{
-                            label: 'Indicadores',
-                            data: [data.preenchidos, data.pendentes],
-                            backgroundColor: ['#42A5F5', '#90CAF9'],
-                            borderColor: '#fff',
-                            borderWidth: 2,
-                            hoverOffset: 40,
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        animation: {
-                            animateScale: true,
-                            duration: 1200,
-                        },
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    color: '#333',
-                                    font: { size: 14, weight: 'bold' }
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: ctx => `${ctx.label}: ${ctx.parsed} indicadores`
-                                }
-                            }
-                        }
-                    }
-                });
-
-                const container = document.querySelector('.cards-indicadores');
-                container.innerHTML = '';
-
-                if (data.indicadores.length === 0) {
-                    container.innerHTML = '<p class="sem-indicadores">Nenhum indicador encontrado.</p>';
-                } else {
-                    data.indicadores.forEach(ind => {
-                        const card = document.createElement('article');
-                        card.className = 'card-indicador';
-                        card.setAttribute('tabindex', '0');
-                        card.setAttribute('role', 'button');
-                        card.setAttribute('aria-label', `Indicador ${ind.nome}, valor ${ind.valor}`);
-
-                        card.innerHTML = `
-                            <h4>${ind.nome}</h4>
-                            <span class="valor">${ind.valor.toLocaleString(undefined, {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                            })}</span>
-                        `;
-
-                        card.addEventListener('click', () => {
-                            window.location.href = 'formulario-indicador.php?id=' + ind.id;
-                        });
-                        card.addEventListener('keydown', e => {
-                            if (e.key === 'Enter' || e.key === ' ') {
-                                e.preventDefault();
-                                card.click();
-                            }
-                        });
-
-                        container.appendChild(card);
-                    });
-                }
-
+                atualizarGrafico(data);
+                preencherCartoes(data.indicadores);
             } catch (error) {
                 console.error(error);
                 alert('Erro ao carregar dados do painel.');
+            }
+        }
+
+        function atualizarGrafico(dados) {
+            const ctx = document.getElementById('indicadoresChart').getContext('2d');
+            if (window.chartIndicadores) window.chartIndicadores.destroy();
+
+            window.chartIndicadores = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Preenchidos', 'Pendentes'],
+                    datasets: [{
+                        label: 'Indicadores',
+                        data: [dados.preenchidos, dados.pendentes],
+                        backgroundColor: ['#42A5F5', '#90CAF9'],
+                        borderColor: '#fff',
+                        borderWidth: 2,
+                        hoverOffset: 40,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#333',
+                                font: { size: 14, weight: 'bold' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function preencherCartoes(indicadores) {
+            const container = document.querySelector('.cards-indicadores');
+            container.innerHTML = '';
+
+            if (indicadores.length === 0) {
+                container.innerHTML = '<p class="sem-indicadores">Nenhum indicador encontrado.</p>';
+            } else {
+                indicadores.forEach(ind => {
+                    const card = document.createElement('article');
+                    card.className = 'card-indicador';
+                    card.setAttribute('tabindex', '0');
+                    card.setAttribute('role', 'button');
+                    card.setAttribute('aria-label', `Indicador ${ind.nome}, valor ${ind.valor}`);
+
+                    card.innerHTML = `
+                        <h4>${ind.nome}</h4>
+                        <span class="valor">${ind.valor.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}</span>
+                    `;
+
+                    card.addEventListener('click', () => {
+                        window.location.href = 'formulario-indicador.php?id=' + ind.id;
+                    });
+                    card.addEventListener('keydown', e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            card.click();
+                        }
+                    });
+
+                    container.appendChild(card);
+                });
             }
         }
 

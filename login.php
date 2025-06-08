@@ -2,6 +2,8 @@
 declare(strict_types=1);
 session_start();
 require_once 'includes/db.php';
+require_once 'includes/auth.php';
+
 
 $erro = null;
 
@@ -16,11 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($usuario && password_verify($senha, $usuario['senha'])) {
             session_regenerate_id(true); // Segurança contra fixação de sessão
-
-            $_SESSION['usuario_id'] = $usuario['id'];
-            $_SESSION['usuario_nome'] = $usuario['nome'];
-            $_SESSION['usuario_tipo'] = $usuario['tipo'];
-            $_SESSION['empresa_id'] = $usuario['empresa_id'];
+$_SESSION['usuario_id'] = $usuario['id'];
+$_SESSION['nome']        = $usuario['nome'];
+$_SESSION['tipo']        = $usuario['tipo'];
+$_SESSION['empresa_id']  = $usuario['empresa_id'];
 
             header("Location: dashboard.php");
             exit;
