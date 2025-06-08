@@ -30,9 +30,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         // Redireciona conforme tipo de usuário
         if ($usuario['tipo'] === 'admin') {
-            header("Location: ../admin/dashboard.php");
+            header("Location: dashboard.php");
         } else {
-            header("Location: ../user/dashboard.php");
+            header("Location: dashboard.php");
         }
         exit();
     } else {
