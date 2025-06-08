@@ -2,34 +2,298 @@
 session_start();
 require_once 'includes/db.php';
 
-// Verifica se é admin
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_tipo'] !== 'admin') {
+// Verifica se está logado
+if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit;
 }
 
-$usuarios = $pdo->query("SELECT id, nome, email, tipo FROM usuarios")->fetchAll();
+$empresa_id = $_SESSION['empresa_id'];
+$erro = null;
+$sucesso = null;
+
+// EXCLUIR USUÁRIO via ?excluir=id
+if (isset($_GET['excluir'])) {
+    $excluir_id = (int) $_GET['excluir'];
+
+    // Só excluir se o usuário for da mesma empresa
+    $stmt = $pdo->prepare("SELECT empresa_id FROM usuarios WHERE id = ?");
+    $stmt->execute([$excluir_id]);
+    $userEmpresa = $stmt->fetchColumn();
+
+    if ($userEmpresa == $empresa_id && $excluir_id != $_SESSION['usuario_id']) {
+        $del = $pdo->prepare("DELETE FROM usuarios WHERE id = ?");
+        $del->execute([$excluir_id]);
+        $sucesso = "Usuário excluído com sucesso.";
+    } else {
+        $erro = "Não foi possível excluir esse usuário.";
+    }
+}
+
+// ADICIONAR NOVO USUÁRIO via POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['acao'] === 'adicionar') {
+    $nome = trim($_POST['nome'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $senha = $_POST['senha'] ?? '';
+    $tipo = $_POST['tipo'] ?? '';
+
+    if (!$nome || !$email || !$senha || !$tipo) {
+        $erro = "Preencha todos os campos do formulário.";
+    } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $erro = "E-mail inválido.";
+    } else if (!in_array($tipo, ['admin', 'user'])) {
+        $erro = "Tipo de usuário inválido.";
+    } else {
+        // Verifica se email já existe na empresa
+        $check = $pdo->prepare("SELECT COUNT(*) FROM usuarios WHERE email = ? AND empresa_id = ?");
+        $check->execute([$email, $empresa_id]);
+        if ($check->fetchColumn() > 0) {
+            $erro = "Já existe um usuário com esse e-mail na sua empresa.";
+        } else {
+            $hashSenha = password_hash($senha, PASSWORD_DEFAULT);
+            $insert = $pdo->prepare("INSERT INTO usuarios (nome, email, senha, tipo, empresa_id) VALUES (?, ?, ?, ?, ?)");
+            $insert->execute([$nome, $email, $hashSenha, $tipo, $empresa_id]);
+            $sucesso = "Usuário cadastrado com sucesso.";
+        }
+    }
+}
+
+// Buscar usuários da mesma empresa
+$stmt = $pdo->prepare("SELECT id, nome, email, tipo FROM usuarios WHERE empresa_id = ?");
+$stmt->execute([$empresa_id]);
+$usuarios = $stmt->fetchAll();
+
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Usuários - Admin</title>
+    <title>Gerenciar Usuários - Sistema GRI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #004080, #007BFF);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 15px;
+        }
+        .container {
+            background: #fff;
+            border-radius: 16px;
+            padding: 30px 25px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        h1 {
+            text-align: center;
+            color: #004080;
+            margin-bottom: 20px;
+        }
+        .welcome {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 18px;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #004080;
+            color: white;
+            font-weight: 600;
+        }
+        tr:hover {
+            background-color: #f0f8ff;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+        .btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            color: white;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+        }
+        .btn-delete:hover {
+            background-color: #a71d2a;
+        }
+        form {
+            max-width: 500px;
+            margin: 0 auto 20px auto;
+            background: #f9f9f9;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        form h2 {
+            margin-top: 0;
+            color: #004080;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="password"],
+        form select {
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 18px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        form input:focus,
+        form select:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+        form button {
+            width: 100%;
+            padding: 14px;
+            background-color: #004080;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        form button:hover {
+            background-color: #0066cc;
+        }
+        .msg {
+            max-width: 500px;
+            margin: 0 auto 20px auto;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+        }
+        .msg.error {
+            background: #ffdede;
+            color: #a70000;
+            box-shadow: 0 0 8px #a70000aa;
+        }
+        .msg.success {
+            background: #d1ffd8;
+            color: #228a22;
+            box-shadow: 0 0 8px #228a2288;
+        }
+        @media (max-width: 600px) {
+            th, td {
+                padding: 10px 8px;
+            }
+            .actions {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h2>Usuários cadastrados</h2>
-    <table border="1">
-        <tr>
-            <th>Nome</th><th>Email</th><th>Tipo</th>
-        </tr>
-        <?php foreach ($usuarios as $u): ?>
+
+<div class="container">
+    <h1>Gerenciar Usuários</h1>
+    <p class="welcome">Olá, <?= htmlspecialchars($_SESSION['nome']) ?>! Veja os usuários da sua empresa.</p>
+
+    <?php if ($erro): ?>
+        <div class="msg error"><?= htmlspecialchars($erro) ?></div>
+    <?php endif; ?>
+    <?php if ($sucesso): ?>
+        <div class="msg success"><?= htmlspecialchars($sucesso) ?></div>
+    <?php endif; ?>
+
+    <table>
+        <thead>
             <tr>
-                <td><?= htmlspecialchars($u['nome']) ?></td>
-                <td><?= htmlspecialchars($u['email']) ?></td>
-                <td><?= htmlspecialchars($u['tipo']) ?></td>
+                <th>Nome</th>
+                <th>E-mail</th>
+                <th>Tipo</th>
+                <th>Ações</th>
             </tr>
-        <?php endforeach; ?>
+        </thead>
+        <tbody>
+        <?php if ($usuarios): ?>
+            <?php foreach ($usuarios as $u): ?>
+                <tr>
+                    <td><?= htmlspecialchars($u['nome']) ?></td>
+                    <td><?= htmlspecialchars($u['email']) ?></td>
+                    <td><?= htmlspecialchars($u['tipo']) ?></td>
+                    <td class="actions">
+                        <?php if ($u['id'] != $_SESSION['usuario_id']): ?>
+                            <a href="?excluir=<?= $u['id'] ?>" class="btn btn-delete" onclick="return confirm('Tem certeza que deseja excluir o usuário <?= htmlspecialchars($u['nome']) ?>?')">Excluir</a>
+                        <?php else: ?>
+                            <em>Você</em>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr><td colspan="4" style="text-align:center; padding: 15px;">Nenhum usuário cadastrado nesta empresa.</td></tr>
+        <?php endif; ?>
+        </tbody>
     </table>
+
+    <form method="post" action="">
+        <h2>Adicionar Novo Usuário</h2>
+        <input type="hidden" name="acao" value="adicionar">
+
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" name="nome" required>
+
+        <label for="email">E-mail</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" required>
+
+        <label for="tipo">Tipo</label>
+        <select id="tipo" name="tipo" required>
+            <option value="" disabled selected>Selecione o tipo</option>
+            <option value="admin">Administrador</option>
+            <option value="user">Usuário</option>
+        </select>
+
+        <button type="submit">Cadastrar Usuário</button>
+    </form>
+</div>
+
 </body>
 </html>
