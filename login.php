@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$email]);
         $usuario = $stmt->fetch();
 
-        if ($usuario && password_verify($senha, $usuario['senha'])) {
+        if ($usuario && $senha ===  $usuario['senha']) {
             session_regenerate_id(true); // Segurança contra fixação de sessão
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['nome']        = $usuario['nome'];

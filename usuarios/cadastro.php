@@ -1,4 +1,3 @@
-<?php
 session_start();
 require_once '../includes/db.php';
 
@@ -17,12 +16,12 @@ $empresas = $pdo->query("SELECT id, nome FROM empresas")->fetchAll();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nome = trim($_POST['nome']);
     $email = trim($_POST['email']);
-    $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
-    $tipo = $_POST['tipo'];
-    $empresa_id = $_POST['empresa_id'];
-    $nova_empresa = trim($_POST['nova_empresa']);
+    $senha = $_POST['senha'];  // texto puro
+    $tipo = $_POST['tipo'] ?? 'user';  // tipo vindo do form ou default user
+    $empresa_id = $_POST['empresa_id'] ?? null;
+    $nova_empresa = trim($_POST['nova_empresa'] ?? '');
 
-    // Verifica se vai cadastrar nova empresa
+    // Cadastrar nova empresa, se houver
     if (!empty($nova_empresa)) {
         $stmt = $pdo->prepare("INSERT INTO empresas (nome) VALUES (?)");
         if ($stmt->execute([$nova_empresa])) {
@@ -32,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // Verifica se temos empresa selecionada ou criada
     if (empty($empresa_id)) {
         $erro = "Você precisa selecionar ou cadastrar uma empresa.";
     }
@@ -44,14 +42,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $erro = "Este e-mail já está cadastrado.";
     }
 
-    // Cadastra o usuário
+    // Cadastra o usuário se não houver erros
     if (empty($erro)) {
-        $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, senha, tipo, empresa_id) VALUES (?, ?, ?, ?, ?)");
-        if ($stmt->execute([$nome, $email, $senha, $tipo, $empresa_id])) {
+        $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, senha, empresa_id, tipo) VALUES (?, ?, ?, ?, ?)");
+        if ($stmt->execute([$nome, $email, $senha, $empresa_id, $tipo])) {
             $sucesso = "Usuário cadastrado com sucesso.";
         } else {
             $erro = "Erro ao cadastrar usuário.";
         }
     }
 }
-?>
