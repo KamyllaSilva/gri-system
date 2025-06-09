@@ -1,9 +1,9 @@
 <?php
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-file_put_contents('log-dashboard.txt', 'Início dashboard-data.php'.PHP_EOL, FILE_APPEND);
-
 error_reporting(E_ALL);
+
+file_put_contents('log-dashboard.txt', 'Início dashboard-data.php' . PHP_EOL, FILE_APPEND);
 
 // Inicia a sessão antes de usar $_SESSION
 session_start();
@@ -18,25 +18,23 @@ header('Content-Type: application/json');
 if (!isset($_SESSION['usuario_id'])) {
     http_response_code(403);
     echo json_encode(['error' => 'Usuário não autenticado']);
-    file_put_contents('log-dashboard.txt', 'Empresa ID: ' . ($empresa_id ?? 'nulo') . PHP_EOL, FILE_APPEND);
-
+    file_put_contents('log-dashboard.txt', 'Usuário não autenticado' . PHP_EOL, FILE_APPEND);
     exit;
 }
-
-// Conexão com o banco
-require_once __DIR__ . '/conexao.php';
-file_put_contents('log-dashboard.txt', 'Empresa ID: ' . ($empresa_id ?? 'nulo') . PHP_EOL, FILE_APPEND);
-
 
 // Verifica se a empresa está definida
 $empresa_id = $_SESSION['empresa_id'] ?? null;
 if (!$empresa_id) {
     http_response_code(403);
     echo json_encode(['error' => 'Empresa não especificada']);
-    file_put_contents('log-dashboard.txt', 'Empresa ID: ' . ($empresa_id ?? 'nulo') . PHP_EOL, FILE_APPEND);
-
+    file_put_contents('log-dashboard.txt', 'Empresa não especificada' . PHP_EOL, FILE_APPEND);
     exit;
 }
+
+// Conexão com o banco
+require_once __DIR__ . '/conexao.php';
+
+file_put_contents('log-dashboard.txt', 'Empresa ID: ' . $empresa_id . PHP_EOL, FILE_APPEND);
 
 // Função para contar indicadores
 function contarIndicadores($pdo, $empresa_id, $condicaoExtra = ''): int {
@@ -44,8 +42,6 @@ function contarIndicadores($pdo, $empresa_id, $condicaoExtra = ''): int {
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$empresa_id]);
     return (int)$stmt->fetchColumn();
-    file_put_contents('log-dashboard.txt', 'Empresa ID: ' . ($empresa_id ?? 'nulo') . PHP_EOL, FILE_APPEND);
-
 }
 
 try {
@@ -58,8 +54,8 @@ try {
     $stmt = $pdo->prepare($sqlLista);
     $stmt->execute([$empresa_id]);
     $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    file_put_contents('log-dashboard.txt', 'Empresa ID: ' . ($empresa_id ?? 'nulo') . PHP_EOL, FILE_APPEND);
 
+    file_put_contents('log-dashboard.txt', 'Indicadores carregados com sucesso' . PHP_EOL, FILE_APPEND);
 
     // Resposta JSON
     echo json_encode([
@@ -67,10 +63,9 @@ try {
         'preenchidos' => $preenchidos,
         'pendentes' => $pendentes,
         'indicadores' => $indicadores
-        file_put_contents('log-dashboard.txt', 'Empresa ID: ' . ($empresa_id ?? 'nulo') . PHP_EOL, FILE_APPEND);
-
     ]);
 } catch (PDOException $e) {
+    file_put_contents('log-dashboard.txt', 'Erro PDO: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
     http_response_code(500);
     echo json_encode(['error' => 'Erro no servidor: ' . $e->getMessage()]);
 }

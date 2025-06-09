@@ -340,7 +340,7 @@ $usuarios = $stmt->fetchAll();
 
 <div class="container">
     <h1 class="page-title">Gerenciar Usuários</h1>
-    <p class="welcome">Olá, <?= htmlspecialchars($_SESSION['nome']) ?>! Veja os usuários da sua empresa.</p>
+    <p class="welcome">Olá, <?= htmlspecialchars($_SESSION['nome'] ?? 'Usuário') ?>! Veja os usuários da sua empresa.</p>
 
     <?php if ($erro): ?>
         <div class="msg error"><?= htmlspecialchars($erro) ?></div>
