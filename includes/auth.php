@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($usuario && password_verify($senha, $usuario['senha'])) {
         // Login OK: definir variáveis de sessão
         $_SESSION['usuario_id'] = (int)$usuario['id'];
-        $_SESSION['usuario_nome'] = $usuario['nome'];
+        $_SESSION['nome'] = $usuario['nome'];
         $_SESSION['tipo'] = $usuario['tipo'];
         $_SESSION['empresa_id'] = (int)$usuario['empresa_id'];
 
