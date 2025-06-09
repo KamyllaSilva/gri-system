@@ -74,7 +74,7 @@ $usuarios = $stmt->fetchAll();
     <style>
         /* Seu CSS já enviado aqui */
         :root {
-          --primary: #1e40af;
+          --primary: #1e3a8a;
           --primary-light: #2563eb;
           --background: #f9fbff;
           --foreground: #1a1a1a;
@@ -113,12 +113,12 @@ $usuarios = $stmt->fetchAll();
           position: sticky;
           top: 0;
           z-index: 1000;
-          flex-wrap: wrap;
+       
         }
 
         header h1 {
           color: white;
-          font-size: 1.5rem;
+          font-size: 1.8rem;
           font-weight: 600;
           flex-grow: 1;
           user-select: none;
