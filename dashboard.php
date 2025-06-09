@@ -153,6 +153,9 @@ require_once __DIR__ . '/includes/auth.php';
         }
 
         window.addEventListener('DOMContentLoaded', carregarDashboard);
+        // Atualizar automaticamente a cada 10 segundos
+setInterval(carregarDashboard, 10000);
+
     </script>
 </body>
 </html>
