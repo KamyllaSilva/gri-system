@@ -36,7 +36,7 @@ require_once __DIR__ . '/conexao.php';
 
 file_put_contents('log-dashboard.txt', 'Empresa ID: ' . $empresa_id . PHP_EOL, FILE_APPEND);
 
-// Função para contar indicadores
+// Função para contar indicadores considerando o status (VARCHAR)
 function contarIndicadores($pdo, $empresa_id, $condicaoExtra = ''): int {
     $sql = "SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ?" . $condicaoExtra;
     $stmt = $pdo->prepare($sql);
@@ -46,11 +46,15 @@ function contarIndicadores($pdo, $empresa_id, $condicaoExtra = ''): int {
 
 try {
     $total = contarIndicadores($pdo, $empresa_id);
-    $preenchidos = contarIndicadores($pdo, $empresa_id, " AND preenchido = 1");
-    $pendentes = contarIndicadores($pdo, $empresa_id, " AND preenchido = 0");
+
+    // Indicadores preenchidos: status = 'preenchido'
+    $preenchidos = contarIndicadores($pdo, $empresa_id, " AND status = 'preenchido'");
+
+    // Indicadores pendentes: status != 'preenchido' ou NULL ou vazio
+    $pendentes = contarIndicadores($pdo, $empresa_id, " AND (status IS NULL OR TRIM(status) = '' OR status != 'preenchido')");
 
     // Buscar indicadores detalhados
-    $sqlLista = "SELECT id, nome, COALESCE(valor, '') AS valor FROM respostas_indicadores WHERE empresa_id = ? ORDER BY nome ASC";
+    $sqlLista = "SELECT id, nome, COALESCE(valor, '') AS valor, COALESCE(status, '') AS status FROM respostas_indicadores WHERE empresa_id = ? ORDER BY nome ASC";
     $stmt = $pdo->prepare($sqlLista);
     $stmt->execute([$empresa_id]);
     $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
