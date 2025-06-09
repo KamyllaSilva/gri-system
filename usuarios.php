@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
         $erro = "Preencha todos os campos do formulário.";
     } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $erro = "E-mail inválido.";
-    } else if (!in_array($tipo, ['admin', 'user'])) {
+    } else if (!in_array($tipo, ['admin', 'usuario'])) {
         $erro = "Tipo de usuário inválido.";
     } else {
         // Verifica se email já existe na empresa
@@ -397,7 +397,7 @@ $usuarios = $stmt->fetchAll();
         <select id="tipo" name="tipo" required>
             <option value="" disabled selected>Selecione o tipo</option>
             <option value="admin">Administrador</option>
-            <option value="user">Usuário</option>
+            <option value="usuario">Usuário</option>
         </select>
 
         <button type="submit">Cadastrar Usuário</button>
