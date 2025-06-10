@@ -109,10 +109,7 @@ $usuarios = $stmt->fetchAll();
           display: flex;
           justify-content: space-between;
           align-items: center;
-          box-shadow: var(--shadow);
-          position: sticky;
-          top: 0;
-          z-index: 1000;
+          flex-wrap: wrap;
        
         }
 
