@@ -105,7 +105,7 @@ $usuarios = $stmt->fetchAll();
         /* HEADER */
         header {
           background-color: var(--primary);
-          padding: 16px 32px;
+          padding: 1 rem 2rem;
           display: flex;
           justify-content: space-between;
           align-items: center;
