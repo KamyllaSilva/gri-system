@@ -54,10 +54,11 @@ try {
     $pendentes = contarIndicadores($pdo, $empresa_id, " AND (status IS NULL OR TRIM(status) = '' OR status != 'preenchido')");
 
     // Buscar indicadores detalhados
-    $sqlLista = "SELECT id, nome, COALESCE(valor, '') AS valor, COALESCE(status, '') AS status FROM respostas_indicadores WHERE empresa_id = ? ORDER BY nome ASC";
-    $stmt = $pdo->prepare($sqlLista);
-    $stmt->execute([$empresa_id]);
-    $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+ $sqlLista = "SELECT id, indicador_id, COALESCE(valor, '') AS valor, COALESCE(status, '') AS status FROM respostas_indicadores WHERE empresa_id = ? ORDER BY indicador_id ASC";
+$stmt = $pdo->prepare($sqlLista);
+$stmt->execute([$empresa_id]);
+$indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
     file_put_contents('log-dashboard.txt', 'Indicadores carregados com sucesso' . PHP_EOL, FILE_APPEND);
 
