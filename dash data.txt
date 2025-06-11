@@ -5,12 +5,16 @@ error_reporting(E_ALL);
 
 file_put_contents('log-dashboard.txt', 'Início dashboard-data.php' . PHP_EOL, FILE_APPEND);
 
+// Inicia a sessão antes de usar $_SESSION
 session_start();
 
+// Inclui o arquivo de autenticação
 require_once 'includes/auth.php';
 
+// Define o tipo de retorno como JSON
 header('Content-Type: application/json');
 
+// Verifica autenticação
 if (!isset($_SESSION['usuario_id'])) {
     http_response_code(403);
     echo json_encode(['error' => 'Usuário não autenticado']);
@@ -18,6 +22,7 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
+// Verifica se a empresa está definida
 $empresa_id = $_SESSION['empresa_id'] ?? null;
 if (!$empresa_id) {
     http_response_code(403);
@@ -26,12 +31,13 @@ if (!$empresa_id) {
     exit;
 }
 
+// Conexão com o banco
 require_once __DIR__ . '/conexao.php';
 
 file_put_contents('log-dashboard.txt', 'Empresa ID: ' . $empresa_id . PHP_EOL, FILE_APPEND);
 
+// Função para contar indicadores considerando o status (VARCHAR)
 function contarIndicadores($pdo, $empresa_id, $condicaoExtra = ''): int {
-    // Evitar SQL Injection no condicaoExtra: só passar strings seguras!
     $sql = "SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ?" . $condicaoExtra;
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$empresa_id]);
@@ -41,20 +47,15 @@ function contarIndicadores($pdo, $empresa_id, $condicaoExtra = ''): int {
 try {
     $total = contarIndicadores($pdo, $empresa_id);
 
+    // Indicadores preenchidos: status = 'preenchido'
     $preenchidos = contarIndicadores($pdo, $empresa_id, " AND status = 'preenchido'");
 
-    // Corrigido pendentes para status != 'preenchido' (exclui status preenchido)
-    // Use AND NOT status = 'preenchido' para evitar dupla contagem
+    // Indicadores pendentes: status != 'preenchido' ou NULL ou vazio
     $pendentes = contarIndicadores($pdo, $empresa_id, " AND (status IS NULL OR TRIM(status) = '' OR status != 'preenchido')");
 
-    // Buscar indicadores detalhados, adaptando os campos conforme necessário
-    $sqlLista = "SELECT 
-                    ri.id, 
-                    ri.indicador_id, 
-                    COALESCE(ri.valor, '') AS valor, 
-                    COALESCE(ri.status, '') AS status, 
-                    COALESCE(i.nome, 'Sem nome') AS nome
-                 FROM respostas_indicadores ri
+    // Buscar indicadores detalhados com join para obter o nome do indicador
+    $sqlLista = "SELECT ri.id, ri.indicador_id, COALESCE(ri.valor, '') AS valor, COALESCE(ri.status, '') AS status, i.nome AS indicador_nome 
+                 FROM respostas_indicadores ri 
                  LEFT JOIN indicadores i ON ri.indicador_id = i.id
                  WHERE ri.empresa_id = ? 
                  ORDER BY i.nome ASC";
@@ -64,6 +65,7 @@ try {
 
     file_put_contents('log-dashboard.txt', 'Indicadores carregados com sucesso' . PHP_EOL, FILE_APPEND);
 
+    // Resposta JSON
     echo json_encode([
         'total' => $total,
         'preenchidos' => $preenchidos,
@@ -73,5 +75,6 @@ try {
 } catch (PDOException $e) {
     file_put_contents('log-dashboard.txt', 'Erro PDO: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
     http_response_code(500);
-    echo json_encode(['error' => 'Erro no servidor']);
+    echo json_encode(['error' => 'Erro no servidor: ' . $e->getMessage()]);
 }
+?>
