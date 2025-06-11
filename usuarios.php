@@ -104,21 +104,20 @@ $usuarios = $stmt->fetchAll();
 
         /* HEADER */
         header {
-          background-color: var(--primary);
-          padding: 1 rem 2rem;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          flex-wrap: wrap;
+            background-color: #1e3a8a;
+            color: #fff;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
        
         }
 
         header h1 {
-          color: white;
-          font-size: 1.8rem;
+          font-size: 1.5rem;
           font-weight: 600;
           flex-grow: 1;
-          user-select: none;
         }
 
         nav {
