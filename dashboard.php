@@ -1,11 +1,7 @@
 <?php
 session_start();
 require_once __DIR__ . '/includes/auth.php';
-
-// Verifica se o usuário está logado (supondo que auth.php cuide disso)
-// Caso contrário, pode redirecionar para login
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -13,17 +9,96 @@ require_once __DIR__ . '/includes/auth.php';
     <title>Painel Profissional - Sistema GRI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="assets/css/dashboard.css" />
     <style>
-        /* Pequenos ajustes para foco visível acessível */
-        a:focus, button:focus, .card-indicador:focus {
-            outline: 3px solid #2470dc;
-            outline-offset: 2px;
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f7f9fc;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
         }
-
-        /* Cursor pointer em elementos clicáveis */
+        header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        header img.logo-small {
+            height: 50px;
+        }
+        nav a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 600;
+        }
+        nav a.active {
+            color: #004080;
+            font-weight: 700;
+        }
+        h1, h2 {
+            color: #004080;
+        }
+        .cards-grid {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+            padding: 20px;
+            flex: 1;
+            text-align: center;
+            cursor: default;
+        }
+        .card h3 {
+            margin-bottom: 12px;
+        }
+        .card p {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        .cards-indicadores {
+            display: grid;
+            grid-template-columns: repeat(auto-fill,minmax(150px,1fr));
+            gap: 15px;
+        }
         .card-indicador {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
             cursor: pointer;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s ease;
+            user-select: none;
+        }
+        .card-indicador:hover, .card-indicador:focus {
+            box-shadow: 0 0 12px #42a5f5;
+            outline: none;
+        }
+        .card-indicador h4 {
+            margin: 0 0 10px 0;
+            font-weight: 600;
+            color: #004080;
+        }
+        .card-indicador .valor {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #333;
+        }
+        .sem-indicadores {
+            font-style: italic;
+            color: #666;
+        }
+        canvas#indicadoresChart {
+            max-width: 100%;
+            margin-bottom: 40px;
         }
     </style>
 </head>
@@ -32,14 +107,14 @@ require_once __DIR__ . '/includes/auth.php';
         <img src="assets/css/img/logo.png" alt="Logo" class="logo-small" />
         <h1>Sistema GRI</h1>
         <nav>
-            <a href="dashboard.php" class="active" aria-current="page">Painel</a>
+            <a href="dashboard.php" class="active">Painel</a>
             <a href="indicadores.php">Indicadores</a>
             <a href="usuarios.php">Usuários</a>
             <a href="logout.php">Sair</a>
         </nav>
     </header>
 
-    <main class="container" role="main">
+    <main>
         <section class="dashboard-header">
             <h2>Painel de Indicadores</h2>
             <p>Bem-vindo(a), <?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Usuário') ?>!</p>
@@ -48,15 +123,15 @@ require_once __DIR__ . '/includes/auth.php';
         <section class="cards-grid" aria-label="Indicadores resumidos">
             <article class="card" tabindex="0" role="region" aria-labelledby="total-indicadores">
                 <h3 id="total-indicadores">Total de Indicadores</h3>
-                <p id="totalIndicadores" aria-live="polite">–</p>
+                <p id="totalIndicadores">–</p>
             </article>
             <article class="card" tabindex="0" role="region" aria-labelledby="preenchidos-indicadores">
                 <h3 id="preenchidos-indicadores">Indicadores Preenchidos</h3>
-                <p id="preenchidosIndicadores" aria-live="polite">–</p>
+                <p id="preenchidosIndicadores">–</p>
             </article>
             <article class="card" tabindex="0" role="region" aria-labelledby="pendentes-indicadores">
                 <h3 id="pendentes-indicadores">Indicadores Pendentes</h3>
-                <p id="pendentesIndicadores" aria-live="polite">–</p>
+                <p id="pendentesIndicadores">–</p>
             </article>
         </section>
 
@@ -71,14 +146,7 @@ require_once __DIR__ . '/includes/auth.php';
     <script>
         async function carregarDashboard() {
             try {
-                const res = await fetch('dashboard-data.php', {
-                    method: 'GET',
-                    credentials: 'same-origin',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-
+                const res = await fetch('dashboard-data.php', { credentials: 'same-origin' });
                 if (!res.ok) throw new Error('Falha ao carregar dados');
 
                 const data = await res.json();
@@ -92,15 +160,15 @@ require_once __DIR__ . '/includes/auth.php';
                 document.getElementById('preenchidosIndicadores').textContent = data.preenchidos;
                 document.getElementById('pendentesIndicadores').textContent = data.pendentes;
 
-                atualizarGrafico(data);
+                atualizarGrafico(data.preenchidos, data.pendentes);
                 preencherCartoes(data.indicadores);
-            } catch (error) {
-                console.error(error);
+            } catch (e) {
+                console.error(e);
                 alert('Erro ao carregar dados do painel.');
             }
         }
 
-        function atualizarGrafico(dados) {
+        function atualizarGrafico(preenchidos, pendentes) {
             const ctx = document.getElementById('indicadoresChart').getContext('2d');
             if (window.chartIndicadores) window.chartIndicadores.destroy();
 
@@ -110,7 +178,7 @@ require_once __DIR__ . '/includes/auth.php';
                     labels: ['Preenchidos', 'Pendentes'],
                     datasets: [{
                         label: 'Indicadores',
-                        data: [dados.preenchidos, dados.pendentes],
+                        data: [preenchidos, pendentes],
                         backgroundColor: ['#42A5F5', '#90CAF9'],
                         borderColor: '#fff',
                         borderWidth: 2,
@@ -123,8 +191,13 @@ require_once __DIR__ . '/includes/auth.php';
                         legend: {
                             position: 'bottom',
                             labels: {
-                                color: '#333',
-                                font: { size: 14, weight: 'bold' }
+                                font: { size: 14, weight: '600' },
+                                color: '#004080'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => `${ctx.label}: ${ctx.parsed}`
                             }
                         }
                     }
@@ -142,41 +215,30 @@ require_once __DIR__ . '/includes/auth.php';
             }
 
             indicadores.forEach(ind => {
-                const card = document.createElement('article');
-                card.className = 'card-indicador';
-                card.setAttribute('tabindex', '0');
-                card.setAttribute('role', 'button');
-                card.setAttribute('aria-label', `Indicador ${ind.nome}, valor ${ind.valor}`);
+                const div = document.createElement('article');
+                div.className = 'card-indicador';
+                div.tabIndex = 0;
+                div.setAttribute('role', 'button');
+                div.setAttribute('aria-pressed', 'false');
+                div.title = `Indicador: ${ind.nome}, Status: ${ind.status}, Valor: ${ind.valor}`;
 
-                // Escapar conteúdo para evitar XSS
-                const nome = ind.nome.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                const valorFormatado = Number(ind.valor).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-
-                card.innerHTML = `
-                    <h4>${nome}</h4>
-                    <span class="valor">${valorFormatado}</span>
+                div.innerHTML = `
+                    <h4>${ind.nome}</h4>
+                    <p class="valor">${ind.valor || '(sem valor)'}</p>
+                    <p>Status: <strong>${ind.status || 'pendente'}</strong></p>
                 `;
 
-                card.addEventListener('click', () => {
+                // Exemplo: clicar abre formulário do indicador (substituir pela rota correta)
+                div.addEventListener('click', () => {
+                    // Redireciona para a página do formulário do indicador
                     window.location.href = 'formulario-indicador.php?id=' + encodeURIComponent(ind.id);
                 });
-                card.addEventListener('keydown', e => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        card.click();
-                    }
-                });
 
-                container.appendChild(card);
+                container.appendChild(div);
             });
         }
 
-        window.addEventListener('DOMContentLoaded', carregarDashboard);
-        // Atualizar automaticamente a cada 10 segundos
-        setInterval(carregarDashboard, 10000);
+        window.addEventListener('load', carregarDashboard);
     </script>
 </body>
 </html>

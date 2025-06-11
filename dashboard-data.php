@@ -3,18 +3,14 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-file_put_contents('log-dashboard.txt', 'Início dashboard-data.php' . PHP_EOL, FILE_APPEND);
-
 session_start();
-
 require_once 'includes/auth.php';
 
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['usuario_id'])) {
+if (empty($_SESSION['usuario_id'])) {
     http_response_code(403);
     echo json_encode(['error' => 'Usuário não autenticado']);
-    file_put_contents('log-dashboard.txt', 'Usuário não autenticado' . PHP_EOL, FILE_APPEND);
     exit;
 }
 
@@ -22,56 +18,47 @@ $empresa_id = $_SESSION['empresa_id'] ?? null;
 if (!$empresa_id) {
     http_response_code(403);
     echo json_encode(['error' => 'Empresa não especificada']);
-    file_put_contents('log-dashboard.txt', 'Empresa não especificada' . PHP_EOL, FILE_APPEND);
     exit;
 }
 
 require_once __DIR__ . '/conexao.php';
 
-file_put_contents('log-dashboard.txt', 'Empresa ID: ' . $empresa_id . PHP_EOL, FILE_APPEND);
-
-function contarIndicadores($pdo, $empresa_id, $condicaoExtra = ''): int {
-    // Evitar SQL Injection no condicaoExtra: só passar strings seguras!
-    $sql = "SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ?" . $condicaoExtra;
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$empresa_id]);
-    return (int)$stmt->fetchColumn();
-}
-
 try {
-    $total = contarIndicadores($pdo, $empresa_id);
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ?");
+    $stmt->execute([$empresa_id]);
+    $total = (int) $stmt->fetchColumn();
 
-    $preenchidos = contarIndicadores($pdo, $empresa_id, " AND status = 'preenchido'");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ? AND status = 'preenchido'");
+    $stmt->execute([$empresa_id]);
+    $preenchidos = (int) $stmt->fetchColumn();
 
-    // Corrigido pendentes para status != 'preenchido' (exclui status preenchido)
-    // Use AND NOT status = 'preenchido' para evitar dupla contagem
-    $pendentes = contarIndicadores($pdo, $empresa_id, " AND (status IS NULL OR TRIM(status) = '' OR status != 'preenchido')");
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM respostas_indicadores WHERE empresa_id = ? AND (status IS NULL OR TRIM(status) = '' OR status != 'preenchido')");
+    $stmt->execute([$empresa_id]);
+    $pendentes = (int) $stmt->fetchColumn();
 
-    // Buscar indicadores detalhados, adaptando os campos conforme necessário
-    $sqlLista = "SELECT 
-                    ri.id, 
-                    ri.indicador_id, 
-                    COALESCE(ri.valor, '') AS valor, 
-                    COALESCE(ri.status, '') AS status, 
-                    COALESCE(i.nome, 'Sem nome') AS nome
-                 FROM respostas_indicadores ri
-                 LEFT JOIN indicadores i ON ri.indicador_id = i.id
-                 WHERE ri.empresa_id = ? 
-                 ORDER BY i.nome ASC";
+    $sqlLista = "
+        SELECT
+            ri.id,
+            ri.indicador_id,
+            COALESCE(ri.valor, '') AS valor,
+            COALESCE(ri.status, '') AS status,
+            COALESCE(i.nome, 'Sem nome') AS nome
+        FROM respostas_indicadores ri
+        LEFT JOIN indicadores i ON ri.indicador_id = i.id
+        WHERE ri.empresa_id = ?
+        ORDER BY i.nome ASC
+    ";
     $stmt = $pdo->prepare($sqlLista);
     $stmt->execute([$empresa_id]);
-    $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    file_put_contents('log-dashboard.txt', 'Indicadores carregados com sucesso' . PHP_EOL, FILE_APPEND);
+    $indicadores = $stmt->fetchAll();
 
     echo json_encode([
         'total' => $total,
         'preenchidos' => $preenchidos,
         'pendentes' => $pendentes,
-        'indicadores' => $indicadores
+        'indicadores' => $indicadores,
     ]);
 } catch (PDOException $e) {
-    file_put_contents('log-dashboard.txt', 'Erro PDO: ' . $e->getMessage() . PHP_EOL, FILE_APPEND);
     http_response_code(500);
     echo json_encode(['error' => 'Erro no servidor']);
 }
