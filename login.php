@@ -44,14 +44,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #004080, #007BFF);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            color: #333;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+        url('assets/css/img/belas-florestas-na-primavera.jpg') no-repeat center center;
+    background-size: cover;
+    background-attachment: scroll;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    color: #1e293b;
         }
 
         .login-container {

@@ -31,11 +31,14 @@ if (isset($_SESSION['usuario_id'])) {
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--fundo);
-            color: var(--texto);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), 
+                url('assets/css/img/belas-florestas-na-primavera.jpg') no-repeat center center;
+                background-size: cover;
+                background-attachment: scroll;
+                color: var(--texto);
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
         }
 
         header {
@@ -86,25 +89,36 @@ if (isset($_SESSION['usuario_id'])) {
             border-radius: 12px;
             box-shadow: 0 4px 24px rgba(0,0,0,0.05);
             margin-bottom: 40px;
-            transition: box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease;
         }
 
         section:hover {
-            box-shadow: 0 6px 32px rgba(0,0,0,0.08);
+          transform: scale(1.01);
+          box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+          filter: brightness(1.02);
         }
 
         section h2 {
             display: flex;
             align-items: center;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             color: var(--azul);
             margin-bottom: 15px;
-            gap: 10px;
+            gap: 12px;
+        }
+
+        section h2 svg {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            display: block;
+            vertical-align: middle;
         }
 
         section p, section ul {
             font-size: 1rem;
             color: #444;
+            line-height: 1.6;
         }
 
         section ul {
@@ -114,6 +128,14 @@ if (isset($_SESSION['usuario_id'])) {
 
         section ul li {
             margin-bottom: 6px;
+        }
+
+        section img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
         }
 
         footer {
@@ -137,6 +159,13 @@ if (isset($_SESSION['usuario_id'])) {
             .button {
                 padding: 10px 16px;
             }
+
+            section h2 {
+                font-size: 1.3rem;
+            }
+            .ajuste-svg{
+            transform: translatey(2px);
+        }
         }
     </style>
 </head>
@@ -186,6 +215,7 @@ if (isset($_SESSION['usuario_id'])) {
             <li>ODS 7: Energia Limpa</li>
             <li>ODS 13: Ação Climática</li>
         </ul>
+        <img src="assets/css/img/ods.jpg" alt="Imagem dos Objetivos de Desenvolvimento Sustentável da ONU">
     </section>
 
     <section>
@@ -205,7 +235,7 @@ if (isset($_SESSION['usuario_id'])) {
 </main>
 
 <footer>
-    &copy; <?= date('Y') ?> Sistema GRI — Projeto Acadêmico
+    &copy; <?= date('Y') ?> Sistema GRI
 </footer>
 
 </body>
