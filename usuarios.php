@@ -331,15 +331,16 @@ $usuarios = $stmt->fetchAll();
 <body>
 
 <header>
-    <h1>Sistema GRI</h1>
-    <nav>
-        <a href="dashboard.php" class="active">Painel</a>
+        <img src="assets/css/img/logo.png" alt="Logo" class="logo-small" />
+        <h1>Sistema GRI</h1>
+        <nav>
+            <a href="dashboard.php" class="active">Painel</a>
             <a href="indicadores.php">Indicadores</a>
             <a href="usuarios.php">Usuários</a>
             <a href="empresas.php">Empresas</a>
             <a href="logout.php">Sair</a>
-    </nav>
-</header>
+        </nav>
+    </header>
 
 <div class="container">
     <h1 class="page-title">Gerenciar Usuários</h1>
