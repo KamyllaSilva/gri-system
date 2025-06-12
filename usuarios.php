@@ -333,9 +333,11 @@ $usuarios = $stmt->fetchAll();
 <header>
     <h1>Sistema GRI</h1>
     <nav>
-        <a href="dashboard.php">Dashboard</a>
-        <a href="usuarios.php" class="active">Usuários</a>
-        <a href="logout.php" class="button">Sair</a>
+        <a href="dashboard.php" class="active">Painel</a>
+            <a href="indicadores.php">Indicadores</a>
+            <a href="usuarios.php">Usuários</a>
+            <a href="empresas.php">Empresas</a>
+            <a href="logout.php">Sair</a>
     </nav>
 </header>
 
