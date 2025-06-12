@@ -123,10 +123,31 @@ main.container {
 
 /* Lista de indicadores detalhados */
 .cards-indicadores {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
     margin-top: 2rem;
+}
+
+/* Seções de categoria */
+.categoria-indicadores {
+    background-color: #ffffff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.titulo-categoria {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a237e;
+    margin-bottom: 1rem;
+}
+
+.cards-grid-categoria {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
 }
 
 .card-indicador {
@@ -157,7 +178,6 @@ main.container {
 
 /* Indicador sem dados */
 .sem-indicadores {
-    grid-column: 1 / -1;
     text-align: center;
     font-style: italic;
     color: #777;
@@ -185,4 +205,18 @@ main.container {
     #indicadoresChart {
         width: 100%;
     }
+    .categoria-titulo {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1e3a8a;
+    margin-top: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.categoria-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+
 }
