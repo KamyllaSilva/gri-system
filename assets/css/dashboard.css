@@ -111,16 +111,6 @@ main.container {
     color: #2563eb;
 }
 
-/* Gráfico */
-#indicadoresChart {
-    max-width: 500px;
-    margin: 2rem auto;
-    background-color: #fff;
-    border-radius: 12px;
-    padding: 1rem;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
-
 /* Lista de indicadores detalhados */
 .cards-indicadores {
     display: flex;

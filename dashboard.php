@@ -80,8 +80,6 @@ require_once __DIR__ . '/includes/auth.php';
             </article>
         </section>
 
-        <canvas id="indicadoresChart" role="img" aria-label="Gráfico de pizza dos indicadores preenchidos e pendentes"></canvas>
-
         <!-- FILTROS: categoria e status -->
         <section class="filtros-dashboard" aria-label="Filtros de indicadores">
             <label for="filtroCategoria">Categoria:</label>
