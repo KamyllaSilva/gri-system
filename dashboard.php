@@ -55,6 +55,7 @@ require_once __DIR__ . '/includes/auth.php';
             <a href="dashboard.php" class="active">Painel</a>
             <a href="indicadores.php">Indicadores</a>
             <a href="usuarios.php">Usuários</a>
+            <a href="empresas.php">Empresas</a>
             <a href="logout.php">Sair</a>
         </nav>
     </header>
