@@ -76,6 +76,7 @@ $usuarios = $stmt->fetchAll();
     <title>Gerenciar Usuários - Sistema GRI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/css/style.css">
     <style>
         /* Seu CSS já enviado aqui */
         :root {
@@ -107,42 +108,7 @@ $usuarios = $stmt->fetchAll();
           padding-bottom: 40px;
         }
 
-        /* HEADER */
-        header {
-            background-color: #1e3a8a;
-            color: #fff;
-            padding: 1rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
        
-        }
-
-        header h1 {
-          font-size: 1.5rem;
-          font-weight: 600;
-          flex-grow: 1;
-        }
-
-        nav {
-          display: flex;
-          gap: 1rem;
-        }
-
-        nav a {
-          color: #e0e7ff;
-          text-decoration: none;
-          font-weight: 500;
-          transition: color 0.3s ease;
-        }
-
-        nav a:hover,
-        nav a.active {
-          color: #ffffff;
-          text-decoration: underline;
-        }
-
         /* Container principal */
         .container {
           background: var(--card);

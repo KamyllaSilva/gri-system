@@ -45,6 +45,7 @@ require_once __DIR__ . '/includes/auth.php';
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 1rem;
         }
+        
     </style>
 </head>
 <body>
