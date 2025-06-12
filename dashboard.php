@@ -180,70 +180,71 @@ require_once __DIR__ . '/includes/auth.php';
         }
 
         function preencherCartoes(indicadoresPorCategoria) {
-            const filtroCategoria = document.getElementById('filtroCategoria').value;
-            const filtroStatus = document.getElementById('filtroStatus').value;
+    const filtroCategoria = document.getElementById('filtroCategoria').value;
+    const filtroStatus = document.getElementById('filtroStatus').value;
 
-            const container = document.querySelector('.cards-indicadores');
-            container.innerHTML = '';
+    const container = document.querySelector('.cards-indicadores');
+    container.innerHTML = '';
 
-            const categorias = Object.keys(indicadoresPorCategoria);
-            const categoriasFiltradas = categorias.filter(cat =>
-                filtroCategoria === 'todas' || cat === filtroCategoria
-            );
+    const categorias = Object.keys(indicadoresPorCategoria);
+    const categoriasFiltradas = categorias.filter(cat =>
+        filtroCategoria === 'todas' || cat === filtroCategoria
+    );
 
-            if (categoriasFiltradas.length === 0) {
-                container.innerHTML = '<p class="sem-indicadores">Nenhum indicador encontrado.</p>';
-                return;
-            }
+    if (categoriasFiltradas.length === 0) {
+        container.innerHTML = '<p class="sem-indicadores">Nenhum indicador encontrado.</p>';
+        return;
+    }
 
-            categoriasFiltradas.forEach(categoria => {
-                const indicadores = indicadoresPorCategoria[categoria].filter(ind => {
-                    if (filtroStatus === 'preenchidos') return ind.valor !== 0;
-                    if (filtroStatus === 'pendentes') return ind.valor === 0;
-                    return true;
-                });
+    categoriasFiltradas.forEach(categoria => {
+        const indicadores = indicadoresPorCategoria[categoria].filter(ind => {
+            if (filtroStatus === 'preenchidos') return ind.valor !== null;
+            if (filtroStatus === 'pendentes') return ind.valor === null;
+            return true;
+        });
 
-                if (indicadores.length === 0) return;
+        if (indicadores.length === 0) return;
 
-                const titulo = document.createElement('h3');
-                titulo.textContent = categoria;
-                titulo.className = 'categoria-titulo';
-                container.appendChild(titulo);
+        const titulo = document.createElement('h3');
+        titulo.textContent = categoria;
+        titulo.className = 'categoria-titulo';
+        container.appendChild(titulo);
 
-                const grid = document.createElement('div');
-                grid.className = 'categoria-grid';
+        const grid = document.createElement('div');
+        grid.className = 'categoria-grid';
 
-                indicadores.forEach(ind => {
-                    const card = document.createElement('article');
-                    card.className = 'card-indicador';
-                    card.setAttribute('tabindex', '0');
-                    card.setAttribute('role', 'button');
-                    card.setAttribute('aria-label', `Indicador ${ind.nome}, valor ${ind.valor}`);
+        indicadores.forEach(ind => {
+            const card = document.createElement('article');
+            card.className = 'card-indicador';
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('role', 'button');
+            card.setAttribute('aria-label', `Indicador ${ind.nome}, valor ${ind.valor !== null ? ind.valor : 'não preenchido'}`);
 
-                    card.innerHTML = `
-                        <h4>${ind.nome}</h4>
-                        <span class="valor">${ind.valor !== null ? ind.valor.toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }) : '—'}</span>
-                    `;
+            card.innerHTML = `
+                <h4>${ind.nome}</h4>
+                <span class="valor">${ind.valor !== null ? ind.valor.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) : '—'}</span>
+            `;
 
-                    card.addEventListener('click', () => {
-                        window.location.href = 'formulario-indicador.php?id=' + ind.id;
-                    });
-                    card.addEventListener('keydown', e => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            card.click();
-                        }
-                    });
-
-                    grid.appendChild(card);
-                });
-
-                container.appendChild(grid);
+            card.addEventListener('click', () => {
+                window.location.href = 'formulario-indicador.php?id=' + ind.id;
             });
-        }
+            card.addEventListener('keydown', e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    card.click();
+                }
+            });
+
+            grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+    });
+}
+
 
         document.getElementById('filtroCategoria').addEventListener('change', () => {
             preencherCartoes(dadosOriginais);

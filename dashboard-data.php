@@ -46,7 +46,8 @@ try {
         $agrupados[$categoria][] = [
             'id' => (int) $ind['id'],
             'nome' => $ind['nome'],
-            'valor' => is_numeric($ind['valor']) ? (float) $ind['valor'] : null
+            'valor' => is_numeric($ind['valor']) ? (float) $ind['valor'] : null,
+            'preenchido' => !is_null($ind['valor'])
         ];
     }
 
