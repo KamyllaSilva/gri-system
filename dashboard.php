@@ -351,7 +351,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
             <h1 style="margin-left: 1rem;">Sistema GRI</h1>
         </div>
         <nav>
-            <a href="dashboard.php" class="active">Painel</a>
+            <a href="dashboard.php">Painel</a>
             <a href="indicadores.php">Indicadores</a>
             <a href="usuarios.php">Usuários</a>
             <a href="empresas.php">Empresas</a>
