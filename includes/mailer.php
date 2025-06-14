@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../vendor/autoload.php'; // Ajuste o caminho para o seu arquivo autoload.php
+require_once __DIR__ . '/../vendor/autoload.php';  // Ajuste o caminho relativo conforme sua estrutura
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -8,7 +8,6 @@ function enviarCodigoRedefinicao(string $emailDestino, int $codigo): bool {
     $mail = new PHPMailer(true);
 
     try {
-        // Configurações do servidor SMTP (exemplo Gmail)
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
