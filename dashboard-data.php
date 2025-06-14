@@ -1,67 +1,60 @@
 <?php
 session_start();
-require_once __DIR__ . '/includes/db.php';
+require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/includes/db.php'; // Arquivo com conexão ao banco
 
-header('Content-Type: application/json');
-
-if (empty($_SESSION['usuario_id']) || empty($_SESSION['empresa_id'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Acesso não autorizado.']);
+if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
+    echo json_encode(['error' => 'Acesso não autorizado']);
     exit;
 }
 
-$empresaId = $_SESSION['empresa_id'];
+$empresa_id = $_SESSION['empresa_id'];
 
 try {
-    // Busca todos os indicadores com as respostas (se houver)
-    $stmt = $pdo->prepare("
-        SELECT i.id, i.nome, i.categoria,
-               r.valor AS resposta_valor
-        FROM indicadores i
-        LEFT JOIN respostas_indicadores r
-          ON r.indicador_id = i.id AND r.empresa_id = :empresa_id
-        WHERE i.empresa_id = :empresa_id
-        ORDER BY i.categoria IS NULL, i.categoria ASC, i.nome ASC
-    ");
-    $stmt->execute(['empresa_id' => $empresaId]);
+    // Consulta para obter totais
+    $total = $db->query("SELECT COUNT(*) FROM indicadores")->fetchColumn();
+    
+    $preenchidos = $db->query("SELECT COUNT(DISTINCT ri.indicador_id) 
+                              FROM respostas_indicadores ri 
+                              WHERE ri.empresa_id = $empresa_id")->fetchColumn();
+    
+    $pendentes = $total - $preenchidos;
+
+    // Consulta para obter indicadores por categoria
+    $query = "SELECT 
+                i.id, i.codigo, i.descricao, i.categoria,
+                ri.resposta as valor, ri.status
+              FROM indicadores i
+              LEFT JOIN respostas_indicadores ri ON i.id = ri.indicador_id AND ri.empresa_id = $empresa_id
+              ORDER BY i.categoria, i.codigo";
+    
+    $stmt = $db->query($query);
     $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Contar total, preenchidos e pendentes
-    $total = count($indicadores);
-    $preenchidos = 0;
-    $pendentes = 0;
-
-    $agrupados = [];
-
+    // Organiza por categoria
+    $indicadoresPorCategoria = [];
     foreach ($indicadores as $ind) {
-        $categoria = $ind['categoria'] ?: 'Sem Categoria';
-        if (!isset($agrupados[$categoria])) {
-            $agrupados[$categoria] = [];
+        $categoria = $ind['categoria'] ?? 'Outros';
+        if (!isset($indicadoresPorCategoria[$categoria])) {
+            $indicadoresPorCategoria[$categoria] = [];
         }
-
-        $preenchido = $ind['resposta_valor'] !== null;
-
-        if ($preenchido) {
-            $preenchidos++;
-        } else {
-            $pendentes++;
-        }
-
-        $agrupados[$categoria][] = [
-            'id' => (int) $ind['id'],
-            'nome' => $ind['nome'],
-            'valor' => $preenchido ? (float) $ind['resposta_valor'] : null,
+        
+        $indicadoresPorCategoria[$categoria][] = [
+            'id' => $ind['id'],
+            'nome' => $ind['codigo'] . ' - ' . $ind['descricao'],
+            'valor' => $ind['valor'],
+            'status' => $ind['status']
         ];
     }
 
+    header('Content-Type: application/json');
     echo json_encode([
         'total' => $total,
         'preenchidos' => $preenchidos,
         'pendentes' => $pendentes,
-        'indicadores' => $agrupados,
-    ], JSON_UNESCAPED_UNICODE);
+        'indicadores' => $indicadoresPorCategoria
+    ]);
 
-} catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Erro ao consultar o banco de dados.']);
+} catch (PDOException $e) {
+    echo json_encode(['error' => 'Erro ao carregar dados: ' . $e->getMessage()]);
 }
