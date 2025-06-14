@@ -57,6 +57,7 @@ try {
     <title>Indicadores - Sistema GRI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+   <link rel="stylesheet" href="assets/css/dashboard.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -76,32 +77,7 @@ try {
             padding: 0;
             color: #333;
         }
-        
-        header {
-            background-color: white;
-            box-shadow: var(--box-shadow);
-            padding: 1rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .logo-small {
-            height: 50px;
-        }
-        
-        nav a {
-            margin-left: 1.5rem;
-            text-decoration: none;
-            color: var(--dark-gray);
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-        
-        nav a:hover, nav a.active {
-            color: var(--primary-color);
-        }
-        
+    
         .container {
             max-width: 1200px;
             margin: 2rem auto;
