@@ -139,12 +139,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if ($erro): ?>
         <div class="error"><?= htmlspecialchars($erro) ?></div>
     <?php endif; ?>
+    <?php if (isset($_GET['senha_alterada'])): ?>
+    <div class="success">Senha redefinida com sucesso. Faça login.</div>
+    <?php endif; ?>
+
 
     <form method="POST" autocomplete="off">
         <input type="email" name="email" placeholder="Seu e-mail" required autofocus>
         <input type="password" name="senha" placeholder="Sua senha" required>
         <button type="submit">Entrar</button>
     </form>
+    <div class="register-link">
+    <a href="esqueci_senha.php">Esqueci minha senha</a>
+    </div>
+
 
 </div>
 
