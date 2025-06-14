@@ -5,7 +5,7 @@ if (!isset($_SESSION['usuario_id'])) {
     exit();
 }
 
-// Conexão com o banco (mantido igual ao seu original)
+
 $host = getenv("DB_HOST") ?: 'mysql.railway.internal';
 $dbname = getenv("DB_NAME") ?: 'railway';
 $user = getenv("DB_USER") ?: 'root';
@@ -17,7 +17,7 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
     
-    // Consulta otimizada para sua estrutura de banco
+ 
     $query = "SELECT 
                 i.id, 
                 i.codigo, 
@@ -38,7 +38,7 @@ try {
     $stmt->execute(['empresa_id' => $_SESSION['empresa_id']]);
     $indicadores = $stmt->fetchAll();
     
-    // Agrupar por categoria
+   
     $indicadoresPorCategoria = [];
     foreach ($indicadores as $ind) {
         $categoria = $ind['categoria'] ?? 'Outros';
@@ -373,7 +373,7 @@ try {
         const form = document.getElementById(formId);
         form.style.display = form.style.display === 'block' ? 'none' : 'block';
         
-        // Rolagem suave para o formulário
+        
         if (form.style.display === 'block') {
             form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }

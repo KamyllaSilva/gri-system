@@ -16,13 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $usuario = $stmt->fetch();
 
         if ($usuario && $senha ===  $usuario['senha']) {
-            session_regenerate_id(true); // Segurança contra fixação de sessão
+            session_regenerate_id(true); 
             $_SESSION['usuario_id'] = $usuario['id'];
             $_SESSION['nome']        = $usuario['nome'];
             $_SESSION['tipo']        = $usuario['tipo'];
             $_SESSION['empresa_id']  = $usuario['empresa_id'];
 
-            header("Location: dashboard.php"); // Corrigido para caminho absoluto na raiz
+            header("Location: dashboard.php"); 
             exit;
         } else {
             $erro = "E-mail ou senha inválidos.";

@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Conexão com o banco
+
 $host = getenv("DB_HOST") ?: 'mysql.railway.internal';
 $dbname = getenv("DB_NAME") ?: 'railway';
 $user = getenv("DB_USER") ?: 'root';
@@ -26,7 +26,7 @@ try {
     die("Erro na conexão com o banco: " . $e->getMessage());
 }
 
-// Dados do formulário
+
 $indicador_id = $_POST['indicador_id'] ?? null;
 $resposta = trim($_POST['resposta'] ?? '');
 $resposta_id = $_POST['resposta_id'] ?? null;
@@ -37,7 +37,6 @@ if (empty($indicador_id) || empty($resposta)) {
     die(json_encode(["error" => "Indicador e resposta são obrigatórios."]));
 }
 
-// Processar upload do arquivo
 $caminho_arquivo = null;
 if (isset($_FILES['arquivo']) && $_FILES['arquivo']['error'] === UPLOAD_ERR_OK) {
     $pasta_destino = 'uploads/';
@@ -55,19 +54,19 @@ if (isset($_FILES['arquivo']) && $_FILES['arquivo']['error'] === UPLOAD_ERR_OK) 
     }
 }
 
-// Iniciar transação para garantir consistência
+
 $pdo->beginTransaction();
 
 try {
     if (!empty($resposta_id)) {
-        // ATUALIZAR resposta existente
+        
         $sql = "UPDATE respostas_indicadores 
                 SET resposta = ?, status = 'preenchido'
                 WHERE id = ? AND empresa_id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$resposta, $resposta_id, $empresa_id]);
         
-        // Se há arquivo, inserir na tabela de evidências
+       
         if ($caminho_arquivo) {
             $sqlEvidencia = "INSERT INTO evidencias 
                             (resposta_id, caminho_arquivo, tipo_arquivo)
@@ -80,9 +79,8 @@ try {
             ]);
         }
         
-        $sucesso = 2; // Código para atualização
+        $sucesso = 2; 
     } else {
-        // NOVA resposta
         $sql = "INSERT INTO respostas_indicadores 
                 (indicador_id, resposta, criado_por, empresa_id, status)
                 VALUES (?, ?, ?, ?, 'preenchido')";
@@ -90,7 +88,7 @@ try {
         $stmt->execute([$indicador_id, $resposta, $usuario_id, $empresa_id]);
         $resposta_id = $pdo->lastInsertId();
         
-        // Se há arquivo, inserir na tabela de evidências
+
         if ($caminho_arquivo) {
             $sqlEvidencia = "INSERT INTO evidencias 
                             (resposta_id, caminho_arquivo, tipo_arquivo)
@@ -103,14 +101,13 @@ try {
             ]);
         }
         
-        $sucesso = 1; // Código para criação
+        $sucesso = 1; 
     }
-    
-    // Atualizar status do indicador na tabela indicadores
+
     $sqlUpdateIndicador = "UPDATE indicadores SET preenchido = 1 WHERE id = ?";
     $stmtUpdate = $pdo->prepare($sqlUpdateIndicador);
     $stmtUpdate->execute([$indicador_id]);
-    // No seu código de atualização, adicione:
+    
 $sql = "UPDATE respostas_indicadores 
         SET resposta = ?, status = 'preenchido', updated_at = NOW()
         WHERE id = ? AND empresa_id = ?";

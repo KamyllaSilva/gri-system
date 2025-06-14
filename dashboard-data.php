@@ -13,7 +13,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
 $empresa_id = $_SESSION['empresa_id'];
 
 try {
-    // Consulta para obter totais
+    
     $total = $db->query("SELECT COUNT(*) FROM indicadores")->fetchColumn();
     
     $preenchidos = $db->query("SELECT COUNT(DISTINCT ri.indicador_id) 
@@ -22,7 +22,7 @@ try {
     
     $pendentes = $total - $preenchidos;
 
-    // Consulta para obter indicadores por categoria
+
     $query = "SELECT 
                 i.id, i.codigo, i.descricao, i.categoria,
                 ri.resposta as valor, ri.status
@@ -33,7 +33,7 @@ try {
     $stmt = $db->query($query);
     $indicadores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Organiza por categoria
+
     $indicadoresPorCategoria = [];
     foreach ($indicadores as $ind) {
         $categoria = $ind['categoria'] ?? 'Outros';

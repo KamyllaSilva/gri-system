@@ -1,8 +1,6 @@
 <?php
 session_start();
 require_once 'includes/db.php';
-
-// Verifica se está logado
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit;
@@ -12,11 +10,9 @@ $empresa_id = $_SESSION['empresa_id'];
 $erro = null;
 $sucesso = null;
 
-// EXCLUIR USUÁRIO via ?excluir=id
+
 if (isset($_GET['excluir'])) {
     $excluir_id = (int) $_GET['excluir'];
-
-    // Só excluir se o usuário for da mesma empresa
     $stmt = $pdo->prepare("SELECT empresa_id FROM usuarios WHERE id = ?");
     $stmt->execute([$excluir_id]);
     $userEmpresa = $stmt->fetchColumn();
@@ -44,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
     } else if (!in_array($tipo, ['admin', 'usuario'])) {
         $erro = "Tipo de usuário inválido.";
     } else {
-        // Verifica se email já existe na empresa selecionada
         $check = $pdo->prepare("SELECT COUNT(*) FROM usuarios WHERE email = ? AND empresa_id = ?");
         $check->execute([$email, $empresaSelecionada]);
         if ($check->fetchColumn() > 0) {
@@ -58,11 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao']) && $_POST['ac
     }
 }
 
-// Buscar todas as empresas cadastradas
+
 $stmtEmpresas = $pdo->query("SELECT id, nome FROM empresas ORDER BY nome");
 $empresas = $stmtEmpresas->fetchAll();
-
-// Buscar usuários da mesma empresa
 $stmt = $pdo->prepare("SELECT id, nome, email, tipo FROM usuarios WHERE empresa_id = ?");
 $stmt->execute([$empresa_id]);
 $usuarios = $stmt->fetchAll();
@@ -78,7 +71,6 @@ $usuarios = $stmt->fetchAll();
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        /* Seu CSS já enviado aqui */
         :root {
           --primary: #1e3a8a;
           --primary-light: #2563eb;

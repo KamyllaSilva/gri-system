@@ -2,7 +2,7 @@
 session_start();
 require_once __DIR__ . '/includes/auth.php';
 
-// Verifica se o usuário está logado e tem empresa associada
+
 if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
     header('Location: login.php');
     exit;
@@ -441,14 +441,14 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Variáveis globais
+       
         let indicatorsData = {};
         let indicatorsChart = null;
         let lastUpdate = null;
         let socket = null;
         let isConnected = false;
         
-        // Elementos do DOM
+       
         const totalIndicatorsEl = document.getElementById('total-indicators');
         const completedIndicatorsEl = document.getElementById('completed-indicators');
         const pendingIndicatorsEl = document.getElementById('pending-indicators');
@@ -461,7 +461,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
         const categoryFilter = document.getElementById('category-filter');
         const statusFilter = document.getElementById('status-filter');
         
-        // Formatar data/hora
+        
         function formatDateTime(date) {
             if (!date) return '';
             const options = { 
@@ -475,7 +475,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
             return new Date(date).toLocaleString('pt-BR', options);
         }
         
-        // Mostrar/ocultar loading
+        
         function showLoading(show) {
             if (show) {
                 refreshBtn.disabled = true;
@@ -486,7 +486,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
             }
         }
         
-        // Conectar ao WebSocket
+      
         function connectWebSocket() {
             const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
             const wsUrl = wsProtocol + window.location.host + '/ws/indicators';
@@ -510,7 +510,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
                 console.log('Conexão WebSocket fechada');
                 isConnected = false;
                 
-                // Tentar reconectar após 5 segundos
+               
                 setTimeout(connectWebSocket, 5000);
             };
             
@@ -520,7 +520,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
             };
         }
         
-        // Buscar dados do dashboard
+       
         async function fetchDashboardData() {
             try {
                 showLoading(true);
@@ -556,38 +556,36 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
             }
         }
         
-        // Atualizar o dashboard com novos dados
+        
         function updateDashboard(data) {
             if (!data) return;
             
-            // Armazenar dados
+          
             indicatorsData = data;
             lastUpdate = new Date();
             
-            // Atualizar totais
+           
             totalIndicatorsEl.textContent = data.total_indicators;
             completedIndicatorsEl.textContent = data.completed_indicators;
             pendingIndicatorsEl.textContent = data.pending_indicators;
             
-            // Calcular e atualizar progresso
             const progress = Math.round((data.completed_indicators / data.total_indicators) * 100);
             progressPercentageEl.textContent = `${progress}%`;
             
-            // Atualizar última atualização
+          
             lastUpdateEl.textContent = `Última atualização: ${formatDateTime(lastUpdate)}`;
             updateTimeEl.textContent = formatDateTime(lastUpdate);
             
-            // Atualizar gráfico
             updateChart(data);
             
-            // Atualizar lista de indicadores
+         
             updateIndicatorsList(data.indicators_by_category);
             
-            // Atualizar opções de categoria
+           
             updateCategoryOptions(data.indicators_by_category);
         }
         
-        // Atualizar gráfico
+        
         function updateChart(data) {
             const ctx = document.getElementById('indicatorsChart').getContext('2d');
             
@@ -636,14 +634,14 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
             });
         }
         
-        // Atualizar lista de indicadores
+
         function updateIndicatorsList(indicatorsByCategory) {
             const categoryFilterValue = categoryFilter.value;
             const statusFilterValue = statusFilter.value;
             
             let html = '';
             
-            // Filtrar categorias
+            
             const categories = Object.keys(indicatorsByCategory)
                 .filter(category => categoryFilterValue === 'all' || category === categoryFilterValue);
             
@@ -651,7 +649,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
                 html = '<p class="no-indicators">Nenhum indicador encontrado com os filtros selecionados</p>';
             } else {
                 categories.forEach(category => {
-                    // Filtrar indicadores por status
+                    
                     const indicators = indicatorsByCategory[category]
                         .filter(indicator => {
                             if (statusFilterValue === 'completed') return indicator.status === 'completed';
@@ -695,7 +693,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
             indicatorsListEl.innerHTML = html;
         }
         
-        // Obter classe CSS para status
+        
         function getStatusClass(status) {
             switch (status) {
                 case 'completed': return 'status-answered';
@@ -704,7 +702,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
             }
         }
         
-        // Obter texto para status
+        
         function getStatusText(status) {
             switch (status) {
                 case 'completed': return 'Preenchido';
@@ -713,7 +711,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
             }
         }
         
-        // Atualizar opções de categoria
+        
         function updateCategoryOptions(indicatorsByCategory) {
             const categories = Object.keys(indicatorsByCategory).sort();
             
@@ -725,7 +723,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
             `;
         }
         
-        // Carregar dados iniciais
+        
         async function loadDashboard() {
             const data = await fetchDashboardData();
             if (data) {
@@ -733,7 +731,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
             }
         }
         
-        // Event listeners
+     
         categoryFilter.addEventListener('change', () => {
             updateIndicatorsList(indicatorsData.indicators_by_category);
         });
@@ -744,12 +742,12 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
         
         refreshBtn.addEventListener('click', loadDashboard);
         
-        // Inicialização
+      
         document.addEventListener('DOMContentLoaded', () => {
             loadDashboard();
             connectWebSocket();
             
-            // Atualizar a cada 30 segundos (fallback se WebSocket falhar)
+          
             setInterval(async () => {
                 if (!isConnected) {
                     console.log('Atualizando via polling (fallback)');
