@@ -1,6 +1,11 @@
 <?php
+require_once 'includes/phpmailer/PHPMailer.php';
+require_once 'includes/phpmailer/SMTP.php';
+require_once 'includes/phpmailer/Exception.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+
 
 require __DIR__ . '/../vendor/autoload.php'; // Certifique-se que o caminho está correto
 
