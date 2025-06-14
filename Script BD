@@ -45,6 +45,8 @@ CREATE TABLE respostas_indicadores (
     FOREIGN KEY (indicador_id) REFERENCES indicadores(id),
     FOREIGN KEY (criado_por) REFERENCES usuarios(id),
     FOREIGN KEY (empresa_id) REFERENCES empresas(id)
+    ALTER TABLE respostas_indicadores 
+ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 );
 
 -- Tabela de Evidências (precisa de respostas_indicadores)

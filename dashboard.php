@@ -14,155 +14,368 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
     <meta charset="UTF-8" />
     <title>Painel Profissional - Sistema GRI</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="assets/css/dashboard.css" />
     <style>
-        /* --- Estilos dos filtros --- */
-        .filtros-dashboard {
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --success-color: #16a34a;
+            --danger-color: #dc2626;
+            --warning-color: #d97706;
+            --gray-light: #f3f4f6;
+            --gray-medium: #e5e7eb;
+            --gray-dark: #6b7280;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+        }
+        
+        /* Layout base */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        /* Header */
+        header {
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo-small {
+            height: 50px;
+        }
+        
+        nav a {
+            margin-left: 1.5rem;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        
+        nav a:hover, nav a.active {
+            color: var(--primary-color);
+        }
+        
+        /* Dashboard header */
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+        
+        .dashboard-header h2 {
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .dashboard-header p {
+            color: var(--text-secondary);
+            margin: 0;
+        }
+        
+        /* Cards grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .card h3 {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .card p {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-primary);
+        }
+        
+        .card .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-total .card-icon { background-color: #e0e7ff; color: var(--primary-color); }
+        .card-preenchidos .card-icon { background-color: #dcfce7; color: var(--success-color); }
+        .card-pendentes .card-icon { background-color: #fee2e2; color: var(--danger-color); }
+        .card-progresso .card-icon { background-color: #fef3c7; color: var(--warning-color); }
+        
+        /* Filtros */
+        .filters-container {
             display: flex;
             flex-wrap: wrap;
             gap: 1rem;
             align-items: center;
             margin-bottom: 1.5rem;
-            font-size: 0.95rem;
-            color: #1e3a8a;
-            font-weight: 500;
-        }
-        .filtros-dashboard label {
-            margin-right: 0.3rem;
-        }
-        .filtros-dashboard select {
-            padding: 0.4rem 0.6rem;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            background-color: #fff;
-            font-family: inherit;
-            font-size: 0.95rem;
-        }
-        /* Categorias e grids */
-        .categoria-titulo {
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            color: #1e3a8a;
-            font-weight: 600;
-            font-size: 1.1rem;
-        }
-        .categoria-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1rem;
-        }
-        /* Cards de indicadores */
-        .card-indicador {
             padding: 1rem;
-            border-radius: 8px;
             background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-            border-left: 4px solid #1e3a8a;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .card-indicador:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        .card-indicador h4 {
-            margin: 0 0 0.5rem 0;
-            color: #1e3a8a;
-            font-size: 1rem;
-        }
-        .card-indicador .valor {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #333;
-        }
-        .sem-indicadores {
-            text-align: center;
-            padding: 2rem;
-            color: #666;
-        }
-        /* Status indicators */
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: 0.5rem;
-        }
-        .status-preenchido {
-            background-color: #dcfce7;
-            color: #166534;
-        }
-        .status-pendente {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        /* Loading animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(30,58,138,0.3);
-            border-radius: 50%;
-            border-top-color: #1e3a8a;
-            animation: spin 1s ease-in-out infinite;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        /* Status de atualização */
-        .status-atualizacao {
-            margin-left: auto;
+        
+        .filter-group {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            font-size: 0.9rem;
-            color: #666;
         }
-        .btn-atualizar {
-            padding: 0.25rem 0.75rem;
-            border-radius: 4px;
-            border: 1px solid #1e3a8a;
-            background-color: #1e3a8a;
-            color: white;
-            cursor: pointer;
+        
+        .filter-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .filter-group select {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.375rem;
+            border: 1px solid var(--gray-medium);
+            background-color: white;
             font-family: inherit;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
+            min-width: 160px;
+        }
+        
+        .status-update {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .btn-refresh {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            border: none;
+            background-color: var(--primary-color);
+            color: white;
+            font-family: inherit;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             transition: background-color 0.2s;
         }
-        .btn-atualizar:hover {
-            background-color: #1e40af;
+        
+        .btn-refresh:hover {
+            background-color: var(--primary-dark);
         }
-        /* Cards de resumo */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
+        
+        .loading-indicator {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
         }
-        .card {
-            padding: 1rem;
-            border-radius: 8px;
+        
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Indicadores */
+        .indicators-container {
             background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 1.5rem;
         }
-        .card h3 {
-            margin-top: 0;
-            color: #1e3a8a;
-            font-size: 1rem;
+        
+        .category-section {
+            margin-bottom: 2rem;
         }
-        .card p {
-            font-size: 1.5rem;
+        
+        .category-title {
+            font-size: 1.125rem;
             font-weight: 600;
-            margin-bottom: 0;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--gray-medium);
+        }
+        
+        .indicators-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        
+        .indicator-card {
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            background: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .indicator-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .indicator-card.answered {
+            border-left-color: var(--success-color);
+        }
+        
+        .indicator-card.pending {
+            border-left-color: var(--danger-color);
+        }
+        
+        .indicator-card.partial {
+            border-left-color: var(--warning-color);
+        }
+        
+        .indicator-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+        }
+        
+        .indicator-code {
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 0.875rem;
+        }
+        
+        .indicator-status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+        
+        .status-answered {
+            background-color: #dcfce7;
+            color: var(--success-color);
+        }
+        
+        .status-pending {
+            background-color: #fee2e2;
+            color: var(--danger-color);
+        }
+        
+        .status-partial {
+            background-color: #fef3c7;
+            color: var(--warning-color);
+        }
+        
+        .indicator-name {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        
+        .indicator-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .indicator-date {
+            font-size: 0.75rem;
+            color: var(--gray-dark);
+            margin-top: 0.5rem;
+        }
+        
+        .no-indicators {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray-dark);
+            grid-column: 1 / -1;
+        }
+        
+        /* Progress chart */
+        .chart-container {
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .cards-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .indicators-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filters-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .status-update {
+                margin-left: 0;
+                width: 100%;
+                justify-content: flex-end;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <img src="assets/css/img/logo.png" alt="Logo" class="logo-small" />
-        <h1>Sistema GRI</h1>
+        <div style="display: flex; align-items: center;">
+            <img src="assets/css/img/logo.png" alt="Logo" class="logo-small" />
+            <h1 style="margin-left: 1rem;">Sistema GRI</h1>
+        </div>
         <nav>
             <a href="dashboard.php" class="active">Painel</a>
             <a href="indicadores.php">Indicadores</a>
@@ -175,159 +388,248 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
     <main class="container">
         <section class="dashboard-header">
             <h2>Painel de Indicadores</h2>
-            <p>Bem-vindo(a), <?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Usuário') ?>! <span id="ultimaAtualizacao"></span></p>
+            <p>Bem-vindo(a), <?= htmlspecialchars($_SESSION['usuario_nome'] ?? 'Usuário') ?>! <span id="last-update"></span></p>
         </section>
 
-        <section class="cards-grid" aria-label="Indicadores resumidos">
-            <article class="card" tabindex="0" role="region" aria-labelledby="total-indicadores">
-                <h3 id="total-indicadores">Total de Indicadores</h3>
-                <p id="totalIndicadores"><span class="loading"></span></p>
+        <div class="cards-grid">
+            <article class="card card-total">
+                <div class="card-icon">
+                    <i class="fas fa-chart-pie fa-lg"></i>
+                </div>
+                <h3>Total de Indicadores</h3>
+                <p id="total-indicators">--</p>
             </article>
-            <article class="card" tabindex="0" role="region" aria-labelledby="preenchidos-indicadores">
-                <h3 id="preenchidos-indicadores">Indicadores Preenchidos</h3>
-                <p id="preenchidosIndicadores"><span class="loading"></span></p>
-            </article>
-            <article class="card" tabindex="0" role="region" aria-labelledby="pendentes-indicadores">
-                <h3 id="pendentes-indicadores">Indicadores Pendentes</h3>
-                <p id="pendentesIndicadores"><span class="loading"></span></p>
-            </article>
-        </section>
-
-        <!-- FILTROS: categoria e status -->
-        <section class="filtros-dashboard" aria-label="Filtros de indicadores">
-            <label for="filtroCategoria">Categoria:</label>
-            <select id="filtroCategoria" aria-controls="cardsIndicadores">
-                <option value="todas">Todas</option>
-            </select>
-
-            <label for="filtroStatus">Status:</label>
-            <select id="filtroStatus" aria-controls="cardsIndicadores">
-                <option value="todos">Todos</option>
-                <option value="preenchidos">Preenchidos</option>
-                <option value="pendentes">Pendentes</option>
-            </select>
             
-            <div class="status-atualizacao">
-                <button id="btnAtualizar" class="btn-atualizar">Atualizar</button>
-                <span id="statusCarregamento" style="display: none;">
-                    <span class="loading"></span> Atualizando...
-                </span>
+            <article class="card card-preenchidos">
+                <div class="card-icon">
+                    <i class="fas fa-check-circle fa-lg"></i>
+                </div>
+                <h3>Preenchidos</h3>
+                <p id="completed-indicators">--</p>
+            </article>
+            
+            <article class="card card-pendentes">
+                <div class="card-icon">
+                    <i class="fas fa-exclamation-circle fa-lg"></i>
+                </div>
+                <h3>Pendentes</h3>
+                <p id="pending-indicators">--</p>
+            </article>
+            
+            <article class="card card-progresso">
+                <div class="card-icon">
+                    <i class="fas fa-tasks fa-lg"></i>
+                </div>
+                <h3>Progresso</h3>
+                <p id="progress-percentage">--%</p>
+            </article>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="indicatorsChart"></canvas>
+        </div>
+
+        <section class="filters-container">
+            <div class="filter-group">
+                <label for="category-filter">Categoria:</label>
+                <select id="category-filter">
+                    <option value="all">Todas</option>
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="status-filter">Status:</label>
+                <select id="status-filter">
+                    <option value="all">Todos</option>
+                    <option value="completed">Preenchidos</option>
+                    <option value="pending">Pendentes</option>
+                </select>
+            </div>
+            
+            <div class="status-update">
+                <button id="refresh-btn" class="btn-refresh">
+                    <i class="fas fa-sync-alt"></i> Atualizar
+                </button>
+                <div id="loading-indicator" class="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    <span>Atualizando...</span>
+                </div>
+                <span id="update-time"></span>
             </div>
         </section>
 
-        <section class="cards-indicadores" aria-label="Lista de indicadores detalhados" id="cardsIndicadores">
-            <p class="sem-indicadores">Carregando indicadores...</p>
+        <section class="indicators-container">
+            <div id="indicators-list">
+                <p class="no-indicators">Carregando indicadores...</p>
+            </div>
         </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        let dadosOriginais = {};
-        let chartIndicadores = null;
-        let ultimaAtualizacao = null;
-
-        // Função para formatar data/hora
-        function formatarDataHora(data) {
-            if (!data) return '';
+        // Variáveis globais
+        let indicatorsData = {};
+        let indicatorsChart = null;
+        let lastUpdate = null;
+        let socket = null;
+        let isConnected = false;
+        
+        // Elementos do DOM
+        const totalIndicatorsEl = document.getElementById('total-indicators');
+        const completedIndicatorsEl = document.getElementById('completed-indicators');
+        const pendingIndicatorsEl = document.getElementById('pending-indicators');
+        const progressPercentageEl = document.getElementById('progress-percentage');
+        const lastUpdateEl = document.getElementById('last-update');
+        const updateTimeEl = document.getElementById('update-time');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const indicatorsListEl = document.getElementById('indicators-list');
+        const categoryFilter = document.getElementById('category-filter');
+        const statusFilter = document.getElementById('status-filter');
+        
+        // Formatar data/hora
+        function formatDateTime(date) {
+            if (!date) return '';
             const options = { 
                 day: '2-digit', 
                 month: '2-digit', 
                 year: 'numeric', 
                 hour: '2-digit', 
-                minute: '2-digit'
+                minute: '2-digit',
+                second: '2-digit'
             };
-            return new Date(data).toLocaleString('pt-BR', options);
+            return new Date(date).toLocaleString('pt-BR', options);
         }
-
-        // Função para mostrar status de carregamento
-        function mostrarCarregamento(mostrar) {
-            const elemento = document.getElementById('statusCarregamento');
-            elemento.style.display = mostrar ? 'flex' : 'none';
+        
+        // Mostrar/ocultar loading
+        function showLoading(show) {
+            if (show) {
+                refreshBtn.disabled = true;
+                loadingIndicator.style.display = 'flex';
+            } else {
+                refreshBtn.disabled = false;
+                loadingIndicator.style.display = 'none';
+            }
+        }
+        
+        // Conectar ao WebSocket
+        function connectWebSocket() {
+            const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+            const wsUrl = wsProtocol + window.location.host + '/ws/indicators';
             
-            const btn = document.getElementById('btnAtualizar');
-            btn.disabled = mostrar;
+            socket = new WebSocket(wsUrl);
+            
+            socket.onopen = function(e) {
+                console.log('Conexão WebSocket estabelecida');
+                isConnected = true;
+            };
+            
+            socket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.type === 'indicators_update') {
+                    console.log('Atualização recebida via WebSocket');
+                    updateDashboard(data.data);
+                }
+            };
+            
+            socket.onclose = function(event) {
+                console.log('Conexão WebSocket fechada');
+                isConnected = false;
+                
+                // Tentar reconectar após 5 segundos
+                setTimeout(connectWebSocket, 5000);
+            };
+            
+            socket.onerror = function(error) {
+                console.error('Erro WebSocket:', error);
+                isConnected = false;
+            };
         }
-
-        async function carregarDashboard() {
+        
+        // Buscar dados do dashboard
+        async function fetchDashboardData() {
             try {
-                mostrarCarregamento(true);
-                const res = await fetch('dashboard-data.php', {
-                    method: 'GET',
+                showLoading(true);
+                
+                const response = await fetch('api/dashboard.php', {
                     headers: {
                         'Cache-Control': 'no-cache',
                         'Pragma': 'no-cache'
-                    },
-                    credentials: 'same-origin'
+                    }
                 });
-
-                if (!res.ok) throw new Error('Falha ao carregar dados');
-
-                const data = await res.json();
-
-                if (data.error) {
-                    alert(data.error);
-                    return;
+                
+                if (!response.ok) {
+                    throw new Error('Falha ao carregar dados');
                 }
-
-                // Atualiza os totais
-                document.getElementById('totalIndicadores').textContent = data.total;
-                document.getElementById('preenchidosIndicadores').textContent = data.preenchidos;
-                document.getElementById('pendentesIndicadores').textContent = data.pendentes;
-
-                // Atualiza o gráfico
-                atualizarGrafico(data);
                 
-                // Armazena os dados originais
-                dadosOriginais = data.indicadores;
+                const data = await response.json();
                 
-                // Preenche as opções de categorias
-                preencherOpcoesCategorias(data.indicadores);
+                if (data.error) {
+                    throw new Error(data.error);
+                }
                 
-                // Preenche os cartões de indicadores
-                preencherCartoes(data.indicadores);
-                
-                // Atualiza a informação da última atualização
-                ultimaAtualizacao = new Date();
-                document.getElementById('ultimaAtualizacao').textContent = `(Última atualização: ${formatarDataHora(ultimaAtualizacao)})`;
-                
+                return data;
             } catch (error) {
-                console.error('Erro ao carregar dashboard:', error);
-                document.getElementById('cardsIndicadores').innerHTML = 
-                    '<p class="sem-indicadores">Erro ao carregar os dados. Tentando novamente...</p>';
+                console.error('Erro ao buscar dados:', error);
+                indicatorsListEl.innerHTML = `
+                    <p class="no-indicators">
+                        Erro ao carregar dados. ${error.message}
+                    </p>
+                `;
+                return null;
             } finally {
-                mostrarCarregamento(false);
+                showLoading(false);
             }
         }
-
-        function atualizarGrafico(dados) {
-            // Cria ou atualiza o canvas do gráfico
-            let canvas = document.getElementById('indicadoresChart');
+        
+        // Atualizar o dashboard com novos dados
+        function updateDashboard(data) {
+            if (!data) return;
             
-            if (!canvas) {
-                canvas = document.createElement('canvas');
-                canvas.id = 'indicadoresChart';
-                document.querySelector('.card').appendChild(canvas);
+            // Armazenar dados
+            indicatorsData = data;
+            lastUpdate = new Date();
+            
+            // Atualizar totais
+            totalIndicatorsEl.textContent = data.total_indicators;
+            completedIndicatorsEl.textContent = data.completed_indicators;
+            pendingIndicatorsEl.textContent = data.pending_indicators;
+            
+            // Calcular e atualizar progresso
+            const progress = Math.round((data.completed_indicators / data.total_indicators) * 100);
+            progressPercentageEl.textContent = `${progress}%`;
+            
+            // Atualizar última atualização
+            lastUpdateEl.textContent = `Última atualização: ${formatDateTime(lastUpdate)}`;
+            updateTimeEl.textContent = formatDateTime(lastUpdate);
+            
+            // Atualizar gráfico
+            updateChart(data);
+            
+            // Atualizar lista de indicadores
+            updateIndicatorsList(data.indicators_by_category);
+            
+            // Atualizar opções de categoria
+            updateCategoryOptions(data.indicators_by_category);
+        }
+        
+        // Atualizar gráfico
+        function updateChart(data) {
+            const ctx = document.getElementById('indicatorsChart').getContext('2d');
+            
+            if (indicatorsChart) {
+                indicatorsChart.destroy();
             }
             
-            const ctx = canvas.getContext('2d');
-            
-            // Destrói o gráfico anterior se existir
-            if (chartIndicadores) {
-                chartIndicadores.destroy();
-            }
-            
-            // Cria o novo gráfico
-            chartIndicadores = new Chart(ctx, {
+            indicatorsChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Preenchidos', 'Pendentes'],
                     datasets: [{
-                        label: 'Indicadores',
-                        data: [dados.preenchidos, dados.pendentes],
-                        backgroundColor: ['#4CAF50', '#F44336'],
-                        borderColor: '#fff',
-                        borderWidth: 2,
-                        hoverOffset: 40,
+                        data: [data.completed_indicators, data.pending_indicators],
+                        backgroundColor: ['#16a34a', '#dc2626'],
+                        borderWidth: 1,
+                        hoverOffset: 10
                     }]
                 },
                 options: {
@@ -337,8 +639,10 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
                         legend: {
                             position: 'bottom',
                             labels: {
-                                color: '#333',
-                                font: { size: 14, weight: 'bold' }
+                                font: {
+                                    family: 'Inter',
+                                    size: 14
+                                }
                             }
                         },
                         tooltip: {
@@ -352,113 +656,136 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
                                 }
                             }
                         }
-                    }
+                    },
+                    cutout: '70%'
                 }
             });
         }
-
-        function preencherOpcoesCategorias(indicadoresPorCategoria) {
-            const select = document.getElementById('filtroCategoria');
-            select.innerHTML = '<option value="todas">Todas</option>';
+        
+        // Atualizar lista de indicadores
+        function updateIndicatorsList(indicatorsByCategory) {
+            const categoryFilterValue = categoryFilter.value;
+            const statusFilterValue = statusFilter.value;
             
-            // Ordena as categorias alfabeticamente
-            const categorias = Object.keys(indicadoresPorCategoria).sort();
+            let html = '';
             
-            categorias.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.textContent = cat;
-                select.appendChild(opt);
-            });
-        }
-
-        function preencherCartoes(indicadoresPorCategoria) {
-            const filtroCategoria = document.getElementById('filtroCategoria').value;
-            const filtroStatus = document.getElementById('filtroStatus').value;
-
-            const container = document.getElementById('cardsIndicadores');
-            container.innerHTML = '';
-
-            const categorias = Object.keys(indicadoresPorCategoria);
-            const categoriasFiltradas = categorias.filter(cat =>
-                filtroCategoria === 'todas' || cat === filtroCategoria
-            );
-
-            if (categoriasFiltradas.length === 0) {
-                container.innerHTML = '<p class="sem-indicadores">Nenhum indicador encontrado com os filtros selecionados.</p>';
-                return;
-            }
-
-            categoriasFiltradas.forEach(categoria => {
-                const indicadores = indicadoresPorCategoria[categoria].filter(ind => {
-                    if (filtroStatus === 'preenchidos') return ind.valor !== null;
-                    if (filtroStatus === 'pendentes') return ind.valor === null;
-                    return true;
-                });
-
-                if (indicadores.length === 0) return;
-
-                const titulo = document.createElement('h3');
-                titulo.textContent = categoria;
-                titulo.className = 'categoria-titulo';
-                container.appendChild(titulo);
-
-                const grid = document.createElement('div');
-                grid.className = 'categoria-grid';
-
-                indicadores.forEach(ind => {
-                    const card = document.createElement('article');
-                    card.className = 'card-indicador';
-                    card.setAttribute('tabindex', '0');
-                    card.setAttribute('role', 'button');
-                    card.setAttribute('aria-label', `Indicador ${ind.nome}, ${ind.valor !== null ? 'preenchido' : 'pendente'}`);
-
-                    const statusBadge = ind.valor !== null ? 
-                        '<span class="status-badge status-preenchido">Preenchido</span>' : 
-                        '<span class="status-badge status-pendente">Pendente</span>';
-
-                    card.innerHTML = `
-                        <h4>${ind.nome} ${statusBadge}</h4>
-                        <span class="valor">${ind.valor !== null ? ind.valor.toLocaleString('pt-BR', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        }) : '—'}</span>
+            // Filtrar categorias
+            const categories = Object.keys(indicatorsByCategory)
+                .filter(category => categoryFilterValue === 'all' || category === categoryFilterValue);
+            
+            if (categories.length === 0) {
+                html = '<p class="no-indicators">Nenhum indicador encontrado com os filtros selecionados</p>';
+            } else {
+                categories.forEach(category => {
+                    // Filtrar indicadores por status
+                    const indicators = indicatorsByCategory[category]
+                        .filter(indicator => {
+                            if (statusFilterValue === 'completed') return indicator.status === 'completed';
+                            if (statusFilterValue === 'pending') return indicator.status === 'pending';
+                            return true;
+                        });
+                    
+                    if (indicators.length === 0) return;
+                    
+                    html += `
+                        <div class="category-section">
+                            <h3 class="category-title">${category}</h3>
+                            <div class="indicators-grid">
+                                ${indicators.map(indicator => `
+                                    <div class="indicator-card ${indicator.status}" 
+                                         onclick="window.location.href='indicadores.php?indicador_id=${indicator.id}'"
+                                         tabindex="0"
+                                         role="button"
+                                         aria-label="Indicador ${indicator.code} - ${indicator.name}, ${indicator.status === 'completed' ? 'preenchido' : 'pendente'}">
+                                        <div class="indicator-header">
+                                            <span class="indicator-code">${indicator.code}</span>
+                                            <span class="indicator-status ${getStatusClass(indicator.status)}">
+                                                ${getStatusText(indicator.status)}
+                                            </span>
+                                        </div>
+                                        <h4 class="indicator-name">${indicator.name}</h4>
+                                        <p class="indicator-value">${indicator.value || '—'}</p>
+                                        ${indicator.updated_at ? `
+                                            <p class="indicator-date">
+                                                Atualizado em: ${formatDateTime(indicator.updated_at)}
+                                            </p>
+                                        ` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
                     `;
-
-                    card.addEventListener('click', () => {
-                        window.location.href = 'formulario-indicador.php?id=' + ind.id;
-                    });
-                    card.addEventListener('keydown', e => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            card.click();
-                        }
-                    });
-
-                    grid.appendChild(card);
                 });
-
-                container.appendChild(grid);
-            });
+            }
+            
+            indicatorsListEl.innerHTML = html;
         }
-
-        // Event listeners para os filtros
-        document.getElementById('filtroCategoria').addEventListener('change', () => {
-            preencherCartoes(dadosOriginais);
+        
+        // Obter classe CSS para status
+        function getStatusClass(status) {
+            switch (status) {
+                case 'completed': return 'status-answered';
+                case 'pending': return 'status-pending';
+                default: return 'status-partial';
+            }
+        }
+        
+        // Obter texto para status
+        function getStatusText(status) {
+            switch (status) {
+                case 'completed': return 'Preenchido';
+                case 'pending': return 'Pendente';
+                default: return 'Parcial';
+            }
+        }
+        
+        // Atualizar opções de categoria
+        function updateCategoryOptions(indicatorsByCategory) {
+            const categories = Object.keys(indicatorsByCategory).sort();
+            
+            categoryFilter.innerHTML = `
+                <option value="all">Todas</option>
+                ${categories.map(category => `
+                    <option value="${category}">${category}</option>
+                `).join('')}
+            `;
+        }
+        
+        // Carregar dados iniciais
+        async function loadDashboard() {
+            const data = await fetchDashboardData();
+            if (data) {
+                updateDashboard(data);
+            }
+        }
+        
+        // Event listeners
+        categoryFilter.addEventListener('change', () => {
+            updateIndicatorsList(indicatorsData.indicators_by_category);
         });
-
-        document.getElementById('filtroStatus').addEventListener('change', () => {
-            preencherCartoes(dadosOriginais);
+        
+        statusFilter.addEventListener('change', () => {
+            updateIndicatorsList(indicatorsData.indicators_by_category);
         });
-
-        // Botão de atualização manual
-        document.getElementById('btnAtualizar').addEventListener('click', carregarDashboard);
-
-        // Carrega os dados inicialmente
-        document.addEventListener('DOMContentLoaded', carregarDashboard);
-
-        // Atualiza os dados a cada 30 segundos
-        setInterval(carregarDashboard, 30000);
+        
+        refreshBtn.addEventListener('click', loadDashboard);
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboard();
+            connectWebSocket();
+            
+            // Atualizar a cada 30 segundos (fallback se WebSocket falhar)
+            setInterval(async () => {
+                if (!isConnected) {
+                    console.log('Atualizando via polling (fallback)');
+                    const data = await fetchDashboardData();
+                    if (data) {
+                        updateDashboard(data);
+                    }
+                }
+            }, 30000);
+        });
     </script>
 </body>
 </html>

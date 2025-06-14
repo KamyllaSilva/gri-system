@@ -110,6 +110,10 @@ try {
     $sqlUpdateIndicador = "UPDATE indicadores SET preenchido = 1 WHERE id = ?";
     $stmtUpdate = $pdo->prepare($sqlUpdateIndicador);
     $stmtUpdate->execute([$indicador_id]);
+    // No seu código de atualização, adicione:
+$sql = "UPDATE respostas_indicadores 
+        SET resposta = ?, status = 'preenchido', updated_at = NOW()
+        WHERE id = ? AND empresa_id = ?";
     
     $pdo->commit();
     header("Location: indicadores.php?sucesso=$sucesso");

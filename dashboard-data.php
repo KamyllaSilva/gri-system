@@ -1,7 +1,9 @@
 <?php
 session_start();
-require_once __DIR__ . '/includes/auth.php';
-require_once __DIR__ . '/includes/db.php'; // Arquivo com conexão ao banco
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/db.php';
+
+header('Content-Type: application/json');
 
 if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
     echo json_encode(['error' => 'Acesso não autorizado']);
@@ -15,8 +17,8 @@ try {
     $total = $db->query("SELECT COUNT(*) FROM indicadores")->fetchColumn();
     
     $preenchidos = $db->query("SELECT COUNT(DISTINCT ri.indicador_id) 
-                              FROM respostas_indicadores ri 
-                              WHERE ri.empresa_id = $empresa_id")->fetchColumn();
+                             FROM respostas_indicadores ri 
+                             WHERE ri.empresa_id = $empresa_id")->fetchColumn();
     
     $pendentes = $total - $preenchidos;
 
@@ -43,11 +45,10 @@ try {
             'id' => $ind['id'],
             'nome' => $ind['codigo'] . ' - ' . $ind['descricao'],
             'valor' => $ind['valor'],
-            'status' => $ind['status']
+            'status' => $ind['status'] ?? 'pendente'
         ];
     }
 
-    header('Content-Type: application/json');
     echo json_encode([
         'total' => $total,
         'preenchidos' => $preenchidos,
