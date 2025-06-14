@@ -149,10 +149,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="password" name="senha" placeholder="Sua senha" required>
         <button type="submit">Entrar</button>
     </form>
-    <div class="register-link">
-    <a href="esqueci_senha.php">Esqueci minha senha</a>
-    </div>
-
 
 </div>
 
