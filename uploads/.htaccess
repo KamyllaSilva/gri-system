@@ -5,3 +5,5 @@
 <FilesMatch "\.(pdf|jpeg|png|gif)$">
     Require all granted
 </FilesMatch>
+mkdir uploads
+chmod 777 uploads
