@@ -3,12 +3,10 @@ session_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-// Verifica se o usuário está autenticado
 if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
     die(json_encode(["error" => "Usuário ou empresa não autenticado."]));
 }
 
-// Verifica se a requisição é POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: indicadores.php");
     exit();
@@ -31,11 +29,16 @@ try {
 // Dados do formulário
 $indicador_id = $_POST['indicador_id'] ?? null;
 $resposta = trim($_POST['resposta'] ?? '');
+$resposta_id = $_POST['resposta_id'] ?? null;
 $usuario_id = $_SESSION['usuario_id'];
 $empresa_id = $_SESSION['empresa_id'];
-$caminho_arquivo = null;
 
-// Upload do arquivo (se houver)
+if (empty($indicador_id) || empty($resposta)) {
+    die(json_encode(["error" => "Indicador e resposta são obrigatórios."]));
+}
+
+// Processar upload do arquivo
+$caminho_arquivo = null;
 if (isset($_FILES['arquivo']) && $_FILES['arquivo']['error'] === UPLOAD_ERR_OK) {
     $pasta_destino = 'uploads/';
     if (!is_dir($pasta_destino)) {
@@ -52,16 +55,66 @@ if (isset($_FILES['arquivo']) && $_FILES['arquivo']['error'] === UPLOAD_ERR_OK) 
     }
 }
 
-// Inserção no banco
-$sql = "INSERT INTO respostas_indicadores (indicador_id, resposta, evidencia, criado_por, empresa_id, status)
-        VALUES (?, ?, ?, ?, ?, 'preenchido')";
+// Iniciar transação para garantir consistência
+$pdo->beginTransaction();
 
 try {
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([$indicador_id, $resposta, $caminho_arquivo, $usuario_id, $empresa_id]);
-    header("Location: indicadores.php?sucesso=1");
+    if (!empty($resposta_id)) {
+        // ATUALIZAR resposta existente
+        $sql = "UPDATE respostas_indicadores 
+                SET resposta = ?, status = 'preenchido'
+                WHERE id = ? AND empresa_id = ?";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$resposta, $resposta_id, $empresa_id]);
+        
+        // Se há arquivo, inserir na tabela de evidências
+        if ($caminho_arquivo) {
+            $sqlEvidencia = "INSERT INTO evidencias 
+                            (resposta_id, caminho_arquivo, tipo_arquivo)
+                            VALUES (?, ?, ?)";
+            $stmtEvidencia = $pdo->prepare($sqlEvidencia);
+            $stmtEvidencia->execute([
+                $resposta_id,
+                $caminho_arquivo,
+                $_FILES['arquivo']['type']
+            ]);
+        }
+        
+        $sucesso = 2; // Código para atualização
+    } else {
+        // NOVA resposta
+        $sql = "INSERT INTO respostas_indicadores 
+                (indicador_id, resposta, criado_por, empresa_id, status)
+                VALUES (?, ?, ?, ?, 'preenchido')";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$indicador_id, $resposta, $usuario_id, $empresa_id]);
+        $resposta_id = $pdo->lastInsertId();
+        
+        // Se há arquivo, inserir na tabela de evidências
+        if ($caminho_arquivo) {
+            $sqlEvidencia = "INSERT INTO evidencias 
+                            (resposta_id, caminho_arquivo, tipo_arquivo)
+                            VALUES (?, ?, ?)";
+            $stmtEvidencia = $pdo->prepare($sqlEvidencia);
+            $stmtEvidencia->execute([
+                $resposta_id,
+                $caminho_arquivo,
+                $_FILES['arquivo']['type']
+            ]);
+        }
+        
+        $sucesso = 1; // Código para criação
+    }
+    
+    // Atualizar status do indicador na tabela indicadores
+    $sqlUpdateIndicador = "UPDATE indicadores SET preenchido = 1 WHERE id = ?";
+    $stmtUpdate = $pdo->prepare($sqlUpdateIndicador);
+    $stmtUpdate->execute([$indicador_id]);
+    
+    $pdo->commit();
+    header("Location: indicadores.php?sucesso=$sucesso");
     exit();
 } catch (PDOException $e) {
-    die("Erro ao salvar resposta: " . $e->getMessage());
+    $pdo->rollBack();
+    die("Erro ao processar resposta: " . $e->getMessage());
 }
-?>
