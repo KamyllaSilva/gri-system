@@ -46,33 +46,7 @@ if (!isset($_SESSION['usuario_id']) || !isset($_SESSION['empresa_id'])) {
             margin: 0 auto;
             padding: 1.5rem;
         }
-        
-        /* Header */
-        header {
-            background-color: white;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            padding: 1rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .logo-small {
-            height: 50px;
-        }
-        
-        nav a {
-            margin-left: 1.5rem;
-            text-decoration: none;
-            color: var(--text-secondary);
-            font-weight: 600;
-            transition: color 0.2s;
-        }
-        
-        nav a:hover, nav a.active {
-            color: var(--primary-color);
-        }
-        
+       
         /* Dashboard header */
         .dashboard-header {
             margin-bottom: 2rem;
