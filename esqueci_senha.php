@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['codigo_verificacao'] = $codigo;
         $_SESSION['email_verificacao'] = $email;
 
-        require_once 'includes/mailer.php';
+        require_once '/includes/mailer.php';
 
         if (!enviarCodigoRedefinicao($email, $codigo)) {
             $mensagem = "Erro ao enviar e-mail. Tente novamente.";
